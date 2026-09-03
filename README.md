@@ -1,6 +1,6 @@
 # Lila Joyería
 
-## Pasos para iniciar (Para el equipo)
+## Pasos para iniciar (Para nosotros)
 1. Clonar este repositorio.
 2. Abrir el proyecto en su IDE asegurándose de cargarlo como "Proyecto Maven".
 3. Abrir MySQL Workbench y ejecutar el script ubicado en `recursos_db/lila_joyeria_schema.sql`.
