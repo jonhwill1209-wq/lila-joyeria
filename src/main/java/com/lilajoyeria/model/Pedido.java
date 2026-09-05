@@ -2,6 +2,8 @@ package com.lilajoyeria.model;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Pedido {
 
@@ -10,6 +12,7 @@ public class Pedido {
     private LocalDateTime fechaPedido;
     private BigDecimal total;
     private EstadoPedido estado;
+    private List<DetallePedido> detalles = new ArrayList<>();
 
     public Pedido() {
         this.fechaPedido = LocalDateTime.now();
@@ -99,6 +102,58 @@ public class Pedido {
         this.estado = estado;
     }
 
+    public List<DetallePedido> getDetalles() {
+        return new ArrayList<>(detalles);
+    }
+
+    public void setDetalles(List<DetallePedido> detalles) {
+        this.detalles = new ArrayList<>();
+
+        if (detalles != null) {
+            for (DetallePedido detalle : detalles) {
+                agregarDetalle(detalle);
+            }
+        }
+    }
+
+    public void agregarDetalle(DetallePedido detalle) {
+        if (detalle == null) {
+            throw new IllegalArgumentException(
+                    "El detalle del pedido no puede ser nulo"
+            );
+        }
+
+        if (detalle.getPedido() != this) {
+            detalle.setPedido(this);
+        }
+
+        detalles.add(detalle);
+        calcularTotal();
+    }
+
+    public boolean eliminarDetalle(DetallePedido detalle) {
+        boolean eliminado = detalles.remove(detalle);
+
+        if (eliminado) {
+            calcularTotal();
+        }
+
+        return eliminado;
+    }
+
+    public BigDecimal calcularTotal() {
+        BigDecimal nuevoTotal = BigDecimal.ZERO;
+
+        for (DetallePedido detalle : detalles) {
+            nuevoTotal = nuevoTotal.add(
+                    detalle.calcularSubtotal()
+            );
+        }
+
+        this.total = nuevoTotal;
+        return total;
+    }
+
     @Override
     public String toString() {
         return "Pedido{" +
@@ -107,6 +162,7 @@ public class Pedido {
                 ", fechaPedido=" + fechaPedido +
                 ", total=" + total +
                 ", estado=" + estado +
+                ", cantidadDetalles=" + detalles.size() +
                 '}';
     }
 }
