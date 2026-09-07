@@ -1,4 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <!DOCTYPE html>
 <html lang="es">
@@ -20,7 +21,7 @@
 
         <nav class="menu">
             <a href="${pageContext.request.contextPath}/index.jsp">Inicio</a>
-            <a href="${pageContext.request.contextPath}/catalogo.jsp">Catálogo</a>
+            <a href="${pageContext.request.contextPath}/catalogo">Catálogo</a>
             <a href="${pageContext.request.contextPath}/registro.jsp">Registro</a>
             <a href="${pageContext.request.contextPath}/carrito.jsp">Carrito</a>
         </nav>
@@ -49,47 +50,51 @@
 
                 <tbody>
 
-                <tr>
-                    <td>Anillo Elegante</td>
-                    <td>$120.00</td>
+                <c:choose>
 
-                    <td>
-                        <input
-                                type="number"
-                                value="1"
-                                min="1"
-                                class="cantidad">
-                    </td>
+                    <c:when test="${not empty carrito}">
+                        <c:forEach var="item" items="${carrito}">
 
-                    <td>$120.00</td>
+                            <tr>
+                                <td>
+                                    <c:out value="${item.joya.nombre}" />
+                                </td>
 
-                    <td>
-                        <button class="boton-eliminar">
-                            Eliminar
-                        </button>
-                    </td>
-                </tr>
+                                <td>
+                                    $<c:out value="${item.joya.precio}" />
+                                </td>
 
-                <tr>
-                    <td>Collar Clásico</td>
-                    <td>$85.00</td>
+                                <td>
+                                    <c:out value="${item.cantidad}" />
+                                </td>
 
-                    <td>
-                        <input
-                                type="number"
-                                value="1"
-                                min="1"
-                                class="cantidad">
-                    </td>
+                                <td>
+                                    $<c:out value="${item.precioUnitario}" />
+                                </td>
 
-                    <td>$85.00</td>
+                                <td>
+                                    <button class="boton-eliminar">
+                                        Eliminar
+                                    </button>
+                                </td>
+                            </tr>
 
-                    <td>
-                        <button class="boton-eliminar">
-                            Eliminar
-                        </button>
-                    </td>
-                </tr>
+                        </c:forEach>
+                    </c:when>
+
+                    <c:otherwise>
+
+                        <tr>
+                            <td colspan="5">
+                                <div class="mensaje-info">
+                                    El carrito está vacío.
+                                </div>
+                            </td>
+                        </tr>
+
+                    </c:otherwise>
+
+                </c:choose>
 
                 </tbody>
 
@@ -98,7 +103,10 @@
         </div>
 
         <div class="resumen-carrito">
-            <h3>Total: $205.00</h3>
+            <h3>
+                Total:
+                $<c:out value="${empty totalCarrito ? 0 : totalCarrito}" />
+            </h3>
 
             <button class="boton-formulario">
                 Realizar pedido

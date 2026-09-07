@@ -42,8 +42,8 @@
 
             <c:choose>
 
-                <c:when test="${not empty joyas}">
-                    <c:forEach var="joya" items="${joyas}">
+                <c:when test="${not empty listaJoyas}">
+                    <c:forEach var="joya" items="${listaJoyas}">
 
                         <article class="producto">
 

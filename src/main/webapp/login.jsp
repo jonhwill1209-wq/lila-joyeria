@@ -7,7 +7,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Registro - Lila Joyería</title>
+    <title>Iniciar sesión - Lila Joyería</title>
 
     <link rel="stylesheet"
           href="${pageContext.request.contextPath}/css/estilos.css">
@@ -22,6 +22,7 @@
         <nav class="menu">
             <a href="${pageContext.request.contextPath}/index.jsp">Inicio</a>
             <a href="${pageContext.request.contextPath}/catalogo">Catálogo</a>
+            <a href="${pageContext.request.contextPath}/login.jsp">Login</a>
             <a href="${pageContext.request.contextPath}/registro.jsp">Registro</a>
             <a href="${pageContext.request.contextPath}/carrito.jsp">Carrito</a>
         </nav>
@@ -32,15 +33,9 @@
 
     <section class="formulario-seccion">
 
-        <h2>Crear cuenta</h2>
+        <h2>Iniciar sesión</h2>
 
-        <p>Completa tus datos para registrarte en Lila Joyería.</p>
-
-        <c:if test="${not empty mensajeExito}">
-            <div class="mensaje-exito">
-                <c:out value="${mensajeExito}" />
-            </div>
-        </c:if>
+        <p>Ingresa tus datos para acceder a tu cuenta.</p>
 
         <c:if test="${not empty mensajeError}">
             <div class="mensaje-error">
@@ -48,22 +43,19 @@
             </div>
         </c:if>
 
-        <form action="#" method="post" class="formulario">
-
-            <div class="grupo-formulario">
-                <label for="nombre">Nombre completo</label>
-                <input
-                        type="text"
-                        id="nombre"
-                        name="nombre"
-                        placeholder="Ingresa tu nombre completo"
-                        required
-                        minlength="3"
-                        maxlength="100">
+        <c:if test="${not empty mensajeExito}">
+            <div class="mensaje-exito">
+                <c:out value="${mensajeExito}" />
             </div>
+        </c:if>
+
+        <form action="${pageContext.request.contextPath}/login"
+              method="post"
+              class="formulario">
 
             <div class="grupo-formulario">
                 <label for="email">Correo electrónico</label>
+
                 <input
                         type="email"
                         id="email"
@@ -75,30 +67,18 @@
 
             <div class="grupo-formulario">
                 <label for="password">Contraseña</label>
+
                 <input
                         type="password"
                         id="password"
                         name="password"
                         placeholder="Ingresa tu contraseña"
                         required
-                        minlength="6"
-                        maxlength="255">
-            </div>
-
-            <div class="grupo-formulario">
-                <label for="confirmarPassword">Confirmar contraseña</label>
-                <input
-                        type="password"
-                        id="confirmarPassword"
-                        name="confirmarPassword"
-                        placeholder="Confirma tu contraseña"
-                        required
-                        minlength="6"
                         maxlength="255">
             </div>
 
             <button type="submit" class="boton-formulario">
-                Registrarse
+                Iniciar sesión
             </button>
 
         </form>
@@ -110,31 +90,6 @@
 <footer>
     <p>&copy; 2026 Lila Joyería</p>
 </footer>
-
-<script>
-    const formulario = document.querySelector(".formulario");
-    const password = document.getElementById("password");
-    const confirmarPassword = document.getElementById("confirmarPassword");
-
-    formulario.addEventListener("submit", function (event) {
-
-        if (password.value !== confirmarPassword.value) {
-            event.preventDefault();
-
-            confirmarPassword.setCustomValidity(
-                "Las contraseñas no coinciden"
-            );
-
-            confirmarPassword.reportValidity();
-        } else {
-            confirmarPassword.setCustomValidity("");
-        }
-    });
-
-    confirmarPassword.addEventListener("input", function () {
-        confirmarPassword.setCustomValidity("");
-    });
-</script>
 
 </body>
 </html>

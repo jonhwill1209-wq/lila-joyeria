@@ -20,9 +20,9 @@
 
         <nav class="menu">
             <a href="${pageContext.request.contextPath}/index.jsp">Inicio</a>
-            <a href="${pageContext.request.contextPath}/catalogo.jsp">Catálogo</a>
-            <a href="${pageContext.request.contextPath}/registro.jsp">Registro</a>
-            <a href="${pageContext.request.contextPath}/carrito.jsp">Carrito</a>
+            <a href="${pageContext.request.contextPath}/catalogo">Catálogo</a>
+            <a href="${pageContext.request.contextPath}/registro">Registro</a>
+            <a href="${pageContext.request.contextPath}/carrito">Carrito</a>
         </nav>
     </div>
 </header>
@@ -38,7 +38,9 @@
                 pulseras y accesorios.
             </p>
 
-            <a href="${pageContext.request.contextPath}/catalogo.jsp" class="boton">Ver catálogo</a>
+            <a href="${pageContext.request.contextPath}/catalogo" class="boton">
+                Ver catálogo
+            </a>
         </div>
     </section>
 
