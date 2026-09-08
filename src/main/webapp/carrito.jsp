@@ -1,4 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <!DOCTYPE html>
 <html lang="es">
@@ -20,9 +21,10 @@
 
         <nav class="menu">
             <a href="${pageContext.request.contextPath}/index.jsp">Inicio</a>
-            <a href="${pageContext.request.contextPath}/catalogo.jsp">Catálogo</a>
-            <a href="${pageContext.request.contextPath}/registro.jsp">Registro</a>
-            <a href="${pageContext.request.contextPath}/carrito.jsp">Carrito</a>
+            <a href="${pageContext.request.contextPath}/catalogo">Catálogo</a>
+            <a href="${pageContext.request.contextPath}/login">Login</a>
+            <a href="${pageContext.request.contextPath}/registro">Registro</a>
+            <a href="${pageContext.request.contextPath}/carrito">Carrito</a>
         </nav>
     </div>
 </header>
@@ -33,77 +35,82 @@
 
         <h2>Mi carrito</h2>
 
-        <div class="tabla-contenedor">
+        <c:choose>
 
-            <table class="tabla-carrito">
+            <c:when test="${not empty sessionScope.carrito
+                           and not empty sessionScope.carrito.detalles}">
 
-                <thead>
-                <tr>
-                    <th>Producto</th>
-                    <th>Precio</th>
-                    <th>Cantidad</th>
-                    <th>Subtotal</th>
-                    <th>Acción</th>
-                </tr>
-                </thead>
+                <div class="tabla-contenedor">
 
-                <tbody>
+                    <table class="tabla-carrito">
 
-                <tr>
-                    <td>Anillo Elegante</td>
-                    <td>$120.00</td>
+                        <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Precio</th>
+                            <th>Cantidad</th>
+                            <th>Subtotal</th>
+                        </tr>
+                        </thead>
 
-                    <td>
-                        <input
-                                type="number"
-                                value="1"
-                                min="1"
-                                class="cantidad">
-                    </td>
+                        <tbody>
 
-                    <td>$120.00</td>
+                        <c:forEach var="detalle"
+                                   items="${sessionScope.carrito.detalles}">
 
-                    <td>
-                        <button class="boton-eliminar">
-                            Eliminar
-                        </button>
-                    </td>
-                </tr>
+                            <tr>
 
-                <tr>
-                    <td>Collar Clásico</td>
-                    <td>$85.00</td>
+                                <td>
+                                    <c:out value="${detalle.joya.nombre}" />
+                                </td>
 
-                    <td>
-                        <input
-                                type="number"
-                                value="1"
-                                min="1"
-                                class="cantidad">
-                    </td>
+                                <td>
+                                    $<c:out value="${detalle.precioUnitario}" />
+                                </td>
 
-                    <td>$85.00</td>
+                                <td>
+                                    <c:out value="${detalle.cantidad}" />
+                                </td>
 
-                    <td>
-                        <button class="boton-eliminar">
-                            Eliminar
-                        </button>
-                    </td>
-                </tr>
+                                <td>
+                                    $<c:out value="${detalle.precioUnitario * detalle.cantidad}" />
+                                </td>
 
-                </tbody>
+                            </tr>
 
-            </table>
+                        </c:forEach>
 
-        </div>
+                        </tbody>
 
-        <div class="resumen-carrito">
-            <h3>Total: $205.00</h3>
+                    </table>
 
-            <button class="boton-formulario">
-                Realizar pedido
-            </button>
-        </div>
+                </div>
+
+                <div class="resumen-carrito">
+
+                    <h3>
+                        Total:
+                        $<c:out value="${sessionScope.carrito.total}" />
+                    </h3>
+
+                    <button type="button"
+                            class="boton-formulario">
+                        Realizar pedido
+                    </button>
+
+                </div>
+
+            </c:when>
+
+            <c:otherwise>
+
+                <div class="mensaje-info">
+                    El carrito está vacío.
+                </div>
+
+            </c:otherwise>
+
+        </c:choose>
 
     </section>
 
