@@ -22,8 +22,9 @@
         <nav class="menu">
             <a href="${pageContext.request.contextPath}/index.jsp">Inicio</a>
             <a href="${pageContext.request.contextPath}/catalogo">Catálogo</a>
-            <a href="${pageContext.request.contextPath}/registro.jsp">Registro</a>
-            <a href="${pageContext.request.contextPath}/carrito.jsp">Carrito</a>
+            <a href="${pageContext.request.contextPath}/login">Login</a>
+            <a href="${pageContext.request.contextPath}/registro">Registro</a>
+            <a href="${pageContext.request.contextPath}/carrito">Carrito</a>
         </nav>
     </div>
 </header>
@@ -34,84 +35,82 @@
 
         <h2>Mi carrito</h2>
 
-        <div class="tabla-contenedor">
+        <c:choose>
 
-            <table class="tabla-carrito">
+            <c:when test="${not empty sessionScope.carrito
+                           and not empty sessionScope.carrito.detalles}">
 
-                <thead>
-                <tr>
-                    <th>Producto</th>
-                    <th>Precio</th>
-                    <th>Cantidad</th>
-                    <th>Subtotal</th>
-                    <th>Acción</th>
-                </tr>
-                </thead>
+                <div class="tabla-contenedor">
 
-                <tbody>
+                    <table class="tabla-carrito">
 
-                <c:choose>
+                        <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Precio</th>
+                            <th>Cantidad</th>
+                            <th>Subtotal</th>
+                        </tr>
+                        </thead>
 
-                    <c:when test="${not empty carrito}">
-                        <c:forEach var="item" items="${carrito}">
+                        <tbody>
+
+                        <c:forEach var="detalle"
+                                   items="${sessionScope.carrito.detalles}">
 
                             <tr>
+
                                 <td>
-                                    <c:out value="${item.joya.nombre}" />
+                                    <c:out value="${detalle.joya.nombre}" />
                                 </td>
 
                                 <td>
-                                    $<c:out value="${item.joya.precio}" />
+                                    $<c:out value="${detalle.precioUnitario}" />
                                 </td>
 
                                 <td>
-                                    <c:out value="${item.cantidad}" />
+                                    <c:out value="${detalle.cantidad}" />
                                 </td>
 
                                 <td>
-                                    $<c:out value="${item.precioUnitario}" />
+                                    $<c:out value="${detalle.precioUnitario * detalle.cantidad}" />
                                 </td>
 
-                                <td>
-                                    <button class="boton-eliminar">
-                                        Eliminar
-                                    </button>
-                                </td>
                             </tr>
 
                         </c:forEach>
-                    </c:when>
 
-                    <c:otherwise>
+                        </tbody>
 
-                        <tr>
-                            <td colspan="5">
-                                <div class="mensaje-info">
-                                    El carrito está vacío.
-                                </div>
-                            </td>
-                        </tr>
+                    </table>
 
-                    </c:otherwise>
+                </div>
 
-                </c:choose>
+                <div class="resumen-carrito">
 
-                </tbody>
+                    <h3>
+                        Total:
+                        $<c:out value="${sessionScope.carrito.total}" />
+                    </h3>
 
-            </table>
+                    <button type="button"
+                            class="boton-formulario">
+                        Realizar pedido
+                    </button>
 
-        </div>
+                </div>
 
-        <div class="resumen-carrito">
-            <h3>
-                Total:
-                $<c:out value="${empty totalCarrito ? 0 : totalCarrito}" />
-            </h3>
+            </c:when>
 
-            <button class="boton-formulario">
-                Realizar pedido
-            </button>
-        </div>
+            <c:otherwise>
+
+                <div class="mensaje-info">
+                    El carrito está vacío.
+                </div>
+
+            </c:otherwise>
+
+        </c:choose>
 
     </section>
 
