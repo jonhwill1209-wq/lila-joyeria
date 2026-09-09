@@ -28,6 +28,46 @@ CREATE TABLE joyas (
                        FOREIGN KEY (id_categoria) REFERENCES categorias(id_categoria)
 );
 
+INSERT INTO joyas
+    (nombre, descripcion, material, quilates, precio, stock, id_categoria)
+VALUES
+    (
+        'Anillo Elegante',
+        'Anillo clásico para ocasiones especiales.',
+        'Oro',
+        18.00,
+        120.00,
+        8,
+        (SELECT id_categoria FROM categorias WHERE nombre = 'Anillos' LIMIT 1)
+    ),
+    (
+        'Collar Clásico',
+        'Collar de diseño atemporal.',
+        'Plata',
+        NULL,
+        85.00,
+        12,
+        (SELECT id_categoria FROM categorias WHERE nombre = 'Collares' LIMIT 1)
+    ),
+    (
+        'Pulsera Moderna',
+        'Pulsera ligera con acabado moderno.',
+        'Plata',
+        NULL,
+        60.00,
+        10,
+        (SELECT id_categoria FROM categorias WHERE nombre = 'Pulseras' LIMIT 1)
+    ),
+    (
+        'Aretes Brillantes',
+        'Aretes ideales para complementar cualquier look.',
+        'Oro',
+        14.00,
+        95.00,
+        6,
+        (SELECT id_categoria FROM categorias WHERE nombre = 'Aretes' LIMIT 1)
+    );
+
 CREATE TABLE pedidos (
                          id_pedido INT AUTO_INCREMENT PRIMARY KEY,
                          id_usuario INT NOT NULL,
