@@ -1,12 +1,14 @@
 package com.lilajoyeria.controller;
 
 import com.lilajoyeria.dao.JoyaDAO;
+import com.lilajoyeria.dao.PedidoDAO;
 import com.lilajoyeria.model.DetallePedido;
 import com.lilajoyeria.model.Joya;
 import com.lilajoyeria.model.Pedido;
 import com.lilajoyeria.model.Usuario;
 
 import java.io.IOException;
+import java.sql.SQLException;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -19,10 +21,12 @@ import jakarta.servlet.http.HttpSession;
 public class CarritoServlet extends HttpServlet {
 
     private JoyaDAO joyaDAO;
+    private PedidoDAO pedidoDAO;
 
     @Override
     public void init() {
         joyaDAO = new JoyaDAO();
+        pedidoDAO = new PedidoDAO();
     }
 
     @Override
@@ -38,6 +42,11 @@ public class CarritoServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request,
                           HttpServletResponse response)
             throws ServletException, IOException {
+
+        if ("realizarPedido".equals(request.getParameter("accion"))) {
+            realizarPedido(request, response);
+            return;
+        }
 
         String idJoyaParam = request.getParameter("idJoya");
         String cantidadParam = request.getParameter("cantidad");
@@ -129,6 +138,48 @@ public class CarritoServlet extends HttpServlet {
             response.sendRedirect(
                     request.getContextPath()
                             + "/catalogo?error=ErrorAlAgregar"
+            );
+        }
+    }
+
+    private void realizarPedido(HttpServletRequest request,
+                                HttpServletResponse response)
+            throws IOException {
+
+        HttpSession session = request.getSession();
+        Usuario usuario =
+                (Usuario) session.getAttribute("usuarioLogueado");
+        Pedido carrito =
+                (Pedido) session.getAttribute("carrito");
+
+        if (usuario == null) {
+            response.sendRedirect(
+                    request.getContextPath()
+                            + "/login?continuar=carrito"
+            );
+            return;
+        }
+
+        if (carrito == null || carrito.getDetalles().isEmpty()) {
+            response.sendRedirect(
+                    request.getContextPath() + "/carrito"
+            );
+            return;
+        }
+
+        try {
+            carrito.setUsuario(usuario);
+            pedidoDAO.guardar(carrito);
+            session.removeAttribute("carrito");
+
+            response.sendRedirect(
+                    request.getContextPath()
+                            + "/carrito?pedido=creado"
+            );
+        } catch (SQLException | RuntimeException exception) {
+            response.sendRedirect(
+                    request.getContextPath()
+                            + "/carrito?error=guardar"
             );
         }
     }
