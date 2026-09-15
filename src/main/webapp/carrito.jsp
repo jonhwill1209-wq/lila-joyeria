@@ -35,6 +35,24 @@
 
         <h2>Mi carrito</h2>
 
+        <c:if test="${param.pedido == 'creado'}">
+            <div class="mensaje-exito">
+                Tu pedido fue realizado correctamente.
+            </div>
+        </c:if>
+
+        <c:if test="${param.error == 'login'}">
+            <div class="mensaje-error">
+                Debes iniciar sesión para realizar el pedido.
+            </div>
+        </c:if>
+
+        <c:if test="${param.error == 'guardar'}">
+            <div class="mensaje-error">
+                No fue posible realizar el pedido. Inténtalo nuevamente.
+            </div>
+        </c:if>
+
         <c:choose>
 
             <c:when test="${not empty sessionScope.carrito
@@ -93,10 +111,16 @@
                         $<c:out value="${sessionScope.carrito.total}" />
                     </h3>
 
-                    <button type="button"
-                            class="boton-formulario">
+                    <form action="${pageContext.request.contextPath}/carrito"
+                          method="post">
+                        <input type="hidden"
+                               name="accion"
+                               value="realizarPedido">
+                        <button type="submit"
+                                class="boton-formulario">
                         Realizar pedido
-                    </button>
+                        </button>
+                    </form>
 
                 </div>
 

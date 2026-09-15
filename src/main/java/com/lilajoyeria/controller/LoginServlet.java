@@ -1,6 +1,7 @@
 package com.lilajoyeria.controller;
 
 import com.lilajoyeria.dao.UsuarioDAO;
+import com.lilajoyeria.model.Pedido;
 import com.lilajoyeria.model.Usuario;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
@@ -24,6 +25,12 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        if ("login".equals(request.getParameter("error"))) {
+            request.setAttribute(
+                    "error",
+                    "Debes iniciar sesión para realizar el pedido."
+            );
+        }
         //Redirije a la vista si acceden por GET
         request.getRequestDispatcher("/login.jsp").forward(request, response);
     }
@@ -50,8 +57,20 @@ public class LoginServlet extends HttpServlet {
             if (usuario != null) {
                 HttpSession session = request.getSession();
                 session.setAttribute("usuarioLogueado", usuario);
-                // Redirección exitosa hacia el catálogo
-                response.sendRedirect(request.getContextPath() + "/catalogo");
+
+                Pedido carrito =
+                        (Pedido) session.getAttribute("carrito");
+                if (carrito != null) {
+                    carrito.setUsuario(usuario);
+                }
+
+                String destino = "carrito".equals(
+                        request.getParameter("continuar"))
+                        ? "/carrito"
+                        : "/catalogo";
+                response.sendRedirect(
+                        request.getContextPath() + destino
+                );
             } else {
                 //Retroalimentación de error hacia la vista
                 request.setAttribute("error", "Credenciales incorrectas.");
