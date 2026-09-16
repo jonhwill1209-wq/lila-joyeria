@@ -50,6 +50,7 @@ public class PedidoDAO {
                     "j.nombre AS joya_nombre, " +
                     "j.descripcion, j.material, " +
                     "j.quilates, j.precio, j.stock, " +
+                    "j.imagen, " +
                     "c.id_categoria, " +
                     "c.nombre AS categoria_nombre " +
                     "FROM detalles_pedido d " +
@@ -471,6 +472,7 @@ public class PedidoDAO {
                                     "precio"
                             ),
                             resultado.getInt("stock"),
+                            resultado.getString("imagen"),
                             categoria
                     );
 

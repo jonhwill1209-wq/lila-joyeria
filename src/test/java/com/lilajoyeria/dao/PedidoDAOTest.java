@@ -70,6 +70,7 @@ public class PedidoDAOTest {
                     new BigDecimal("18.00"),
                     new BigDecimal("75.00"),
                     10,
+                    "sin-imagen.jpg",
                     categoria
             );
 
@@ -273,6 +274,7 @@ public class PedidoDAOTest {
                 new BigDecimal("18.00"),
                 new BigDecimal("10.00"),
                 1,
+                "sin-imagen.jpg",
                 categoria
         );
 

@@ -24,6 +24,7 @@ public class ModeloDominioTest {
                 new BigDecimal("18.00"),
                 new BigDecimal("25.50"),
                 10,
+                "sin-imagen.jpg",
                 categoria
         );
 

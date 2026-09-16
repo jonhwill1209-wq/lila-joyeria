@@ -24,6 +24,7 @@ CREATE TABLE joyas (
                        quilates DECIMAL(4,2),
                        precio DECIMAL(10,2) NOT NULL,
                        stock INT NOT NULL DEFAULT 0,
+                       imagen VARCHAR(150) DEFAULT 'sin-imagen.jpg',
                        id_categoria INT,
                        FOREIGN KEY (id_categoria) REFERENCES categorias(id_categoria)
 );
