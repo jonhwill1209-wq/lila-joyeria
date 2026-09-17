@@ -23,6 +23,7 @@ public class JoyaDAO {
                     "j.quilates, " +
                     "j.precio, " +
                     "j.stock, " +
+                    "j.imagen, " +
                     "c.id_categoria, " +
                     "c.nombre AS nombre_categoria " +
                     "FROM joyas j " +
@@ -45,14 +46,14 @@ public class JoyaDAO {
     private static final String SQL_INSERTAR =
             "INSERT INTO joyas " +
                     "(nombre, descripcion, material, quilates, " +
-                    "precio, stock, id_categoria) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?)";
+                    "precio, stock, id_categoria, imagen) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
     private static final String SQL_ACTUALIZAR =
             "UPDATE joyas SET " +
                     "nombre = ?, descripcion = ?, material = ?, " +
                     "quilates = ?, precio = ?, stock = ?, " +
-                    "id_categoria = ? " +
+                    "id_categoria = ?, imagen = ? " +
                     "WHERE id_joya = ?";
 
     private static final String SQL_ELIMINAR =
@@ -192,7 +193,7 @@ public class JoyaDAO {
             establecerParametros(sentencia, joya);
 
             sentencia.setInt(
-                    8,
+                    9,
                     joya.getIdJoya()
             );
 
@@ -264,6 +265,11 @@ public class JoyaDAO {
                             .getIdCategoria()
             );
         }
+
+        sentencia.setString(
+                8,
+                joya.getImagen()
+        );
     }
 
     private void validarJoya(Joya joya) {
@@ -310,6 +316,7 @@ public class JoyaDAO {
                 resultado.getBigDecimal("quilates"),
                 resultado.getBigDecimal("precio"),
                 resultado.getInt("stock"),
+                resultado.getString("imagen"),
                 categoria
         );
     }

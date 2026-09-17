@@ -11,6 +11,7 @@ public class Joya {
     private BigDecimal quilates;
     private BigDecimal precio;
     private int stock;
+    private String imagen;
     private Categoria categoria;
 
     public Joya() {
@@ -18,19 +19,20 @@ public class Joya {
 
     public Joya(String nombre, String descripcion, String material,
                 BigDecimal quilates, BigDecimal precio, int stock,
-                Categoria categoria) {
+                String imagen, Categoria categoria) {
         setNombre(nombre);
         setDescripcion(descripcion);
         setMaterial(material);
         setQuilates(quilates);
         setPrecio(precio);
         setStock(stock);
+        setImagen(imagen);
         setCategoria(categoria);
     }
 
     public Joya(int idJoya, String nombre, String descripcion,
                 String material, BigDecimal quilates, BigDecimal precio,
-                int stock, Categoria categoria) {
+                int stock, String imagen, Categoria categoria) {
         setIdJoya(idJoya);
         setNombre(nombre);
         setDescripcion(descripcion);
@@ -38,6 +40,7 @@ public class Joya {
         setQuilates(quilates);
         setPrecio(precio);
         setStock(stock);
+        setImagen(imagen);
         setCategoria(categoria);
     }
 
@@ -145,6 +148,16 @@ public class Joya {
         this.stock = stock;
     }
 
+    public String getImagen() {
+        return imagen;
+    }
+
+    public void setImagen(String imagen) {
+        this.imagen = (imagen == null || imagen.trim().isEmpty())
+                ? "sin-imagen.jpg"
+                : imagen.trim();
+    }
+
     public Categoria getCategoria() {
         return categoria;
     }
@@ -163,6 +176,7 @@ public class Joya {
                 ", quilates=" + quilates +
                 ", precio=" + precio +
                 ", stock=" + stock +
+                ", imagen='" + imagen + '\'' +
                 ", categoria=" + categoria +
                 '}';
     }

@@ -2,6 +2,7 @@ package com.lilajoyeria.controller;
 import com.lilajoyeria.dao.JoyaDAO;
 import com.lilajoyeria.model.Joya;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.List;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -35,10 +36,20 @@ public class CatalogoServlet extends HttpServlet {
             //Redirigir de manera controlada hacia la vista construida con JSP
             request.getRequestDispatcher("/catalogo.jsp").forward(request, response);
 
-        } catch (Exception e) {
-            // Manejo de errores y retroalimentación
-            request.setAttribute("error", "Error al cargar el catálogo de joyas.");
-            request.getRequestDispatcher("/index.jsp").forward(request, response);
+        } catch (SQLException exception) {
+            getServletContext().log(
+                    "No fue posible cargar el catálogo de joyas.",
+                    exception
+            );
+            request.setAttribute(
+                    "error",
+                    "No fue posible cargar el catálogo. " +
+                            "Verifica la conexión y el esquema de la base de datos."
+            );
+            request.getRequestDispatcher("/catalogo.jsp").forward(
+                    request,
+                    response
+            );
         }
     }
 }

@@ -10,7 +10,7 @@
     <title>Catálogo - Lila Joyería</title>
 
     <link rel="stylesheet"
-          href="${pageContext.request.contextPath}/css/estilos.css">
+          href="${pageContext.request.contextPath}/css/estilos.css?v=2">
 </head>
 
 <body>
@@ -39,6 +39,12 @@
             Explora algunos de nuestros productos disponibles.
         </p>
 
+        <c:if test="${not empty error}">
+            <div class="mensaje-error">
+                <c:out value="${error}" />
+            </div>
+        </c:if>
+
         <c:if test="${param.error == 'DatosInvalidos'}">
             <div class="mensaje-error">
                 No fue posible agregar el producto al carrito.
@@ -66,6 +72,10 @@
                     <c:forEach var="joya" items="${joyas}">
 
                         <article class="producto">
+
+                            <img src="${pageContext.request.contextPath}/img/productos/${joya.imagen}"
+                                 alt="${joya.nombre}"
+                                 class="producto-imagen">
 
                             <h3>
                                 <c:out value="${joya.nombre}" />

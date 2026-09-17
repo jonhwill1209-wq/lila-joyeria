@@ -136,6 +136,16 @@ h1, h2, h3 {
     transition: transform 0.3s ease;
 }
 
+.producto .producto-imagen {
+    display: block;
+    width: 220px !important;
+    max-width: 100%;
+    height: 220px !important;
+    margin: 0 auto 20px;
+    object-fit: contain;
+    border-radius: 6px;
+}
+
 .producto:hover {
     transform: translateY(-5px);
 }
