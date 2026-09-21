@@ -18,10 +18,10 @@ Este proyecto ha sido desarrollado como parte de la asignatura **DESARROLLO DE A
 
 *Nota: Al ser 4 integrantes, se han distribuido los 5 roles técnicos para cubrir toda la arquitectura.*
 
-1. **Jonathan Wilfredo Bonilla Erazo (MM120518)** - *Arquitecto de Entorno y Base de Datos (DevOps & DBA)*
-2. **Norma Susana García Galdamez (GG253588)** - *Desarrollador Modelo (POJOs)*
-3. **Darwin Ezequiel Martínez Rosales (MR251336)** - *Especialista en Persistencia y Acceso a Datos (DAO / JDBC)*
-4. **Francisco José Duran Crespín (DC253061)** - *Desarrollador de Controladores (Servlets) y Frontend (Vistas JSP)*
+1. **Jonathan Wilfredo Bonilla Erazo (MM120518)**  
+2. **Norma Susana García Galdamez (GG253588)**    
+3. **Darwin Ezequiel Martínez Rosales (MR251336)**  
+4. **Francisco José Duran Crespín (DC253061)**  
 
 ---
 
