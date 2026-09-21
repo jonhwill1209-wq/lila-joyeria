@@ -1,71 +1,91 @@
-# 💎 Lila Joyería - Sistema Web
+#  Lila Joyería - E-Commerce MVC
 
-Proyecto web para la gestión de productos y servicios de **Lila Joyería**, desarrollado en **Java (Jakarta EE)** con arquitectura **Maven**, servidor de aplicaciones **Apache Tomcat 10** y base de datos **MySQL**.
+Bienvenido al repositorio oficial de **Lila Joyería**, una aplicación web de comercio electrónico desarrollada en Java aplicando el patrón de arquitectura **Modelo-Vista-Controlador (MVC)**.
 
----
+Este proyecto ha sido desarrollado como parte de la asignatura **DESARROLLO DE APLICACIONES CON WEB FRAMEWORKS (DWF901)**.
 
-##  Requisitos Previos
+##  Tecnologías Utilizadas
 
-Antes de comenzar con el despliegue local, asegúrate de contar con las siguientes herramientas instaladas:
-
-* **Java Development Kit (JDK):** Versión 17 o superior.
-* **Apache Tomcat:** Versión 10.x.
-* **Base de Datos:** Server MySQL y MySQL Workbench.
-* **IDE:** IntelliJ IDEA, NetBeans o Eclipse con soporte para Maven.
-* **Git:** Para el control de versiones.
+* **Backend:** Java 17, Servlets (Jakarta EE 10), JSP, JSTL.
+* **Gestor de Dependencias:** Maven.
+* **Base de Datos:** MySQL 8.0+.
+* **Servidor Web:** Apache Tomcat 10.x.
+* **Arquitectura:** Patrón MVC (Model - View - Controller).
 
 ---
 
-##  Configuración e Instalación del Entorno
+##  Equipo de Desarrollo
 
-Sigue estos pasos para configurar y ejecutar el proyecto localmente por primera vez:
+*Nota: Al ser 4 integrantes, se han distribuido los 5 roles técnicos para cubrir toda la arquitectura.*
 
-1. **Clonar el repositorio:**
-   Ejecuta en tu terminal:
-   `git clone [https://github.com/jonhwill1209-wq/lila-joyeria.git](https://github.com/jonhwill1209-wq/lila-joyeria.git)`
-
-2. **Importar el proyecto:**
-   * Abre tu IDE preferido.
-   * Selecciona la opción **Open** / **Import Project**.
-   * Selecciona la carpeta clonada y asegúrate de cargarlo como **Proyecto Maven** (`pom.xml`) para que se descarguen las dependencias necesarias.
-
-3. **Configurar la Base de Datos:**
-   * Abre **MySQL Workbench** y conéctate a tu servidor local.
-   * Ejecuta el script SQL ubicado en la ruta: `recursos_db/lila_joyeria_schema.sql`
-   * Verifica que se hayan creado la base de datos y las tablas correspondientes.
-
-4. **Credenciales de Conexión:**
-   * Dirígete a la ruta: `src/main/resources/database.properties`
-   * Edita las propiedades del archivo para colocar tu usuario y contraseña local de MySQL.
-
-5. **Configurar el Servidor y Desplegar:**
-   * Agrega y configura un servidor **Apache Tomcat 10** en tu IDE.
-   * Vincula el artefacto del proyecto (`lila-joyeria:war` o `lila-joyeria:war exploded`).
-   * Inicia el servidor y accede en tu navegador (por defecto en `http://localhost:8080/lila-joyeria`).
+1. **Jonathan Wilfredo Bonilla Erazo (MM120518)** - *Arquitecto de Entorno y Base de Datos (DevOps & DBA)*
+2. **Norma Susana García Galdamez (GG253588)** - *Desarrollador Modelo (POJOs)*
+3. **Darwin Ezequiel Martínez Rosales (MR251336)** - *Especialista en Persistencia y Acceso a Datos (DAO / JDBC)*
+4. **Francisco José Duran Crespín (DC253061)** - *Desarrollador de Controladores (Servlets) y Frontend (Vistas JSP)*
 
 ---
 
-##  Flujo de Trabajo con Git (Manejo de Ramas)
+##  Requisitos Previos (Prerrequisitos)
 
-Para mantener la estabilidad del proyecto en la rama principal (`main`), todos los desarrollos, correcciones y nuevas funcionalidades deben trabajarse mediante **ramas secundarias**.
+Para ejecutar este proyecto en tu entorno local, asegúrate de tener instalado:
+* **Java JDK 17** o superior.
+* **Apache Tomcat 10+** (Configurado en el IDE).
+* **MySQL Server 8+** y MySQL Workbench (o similar).
+* IDE recomendado: **IntelliJ IDEA Ultimate** o **Eclipse Enterprise Java**.
 
-1. **Sincronizar la rama principal:**
-   Antes de comenzar a trabajar en algo nuevo, asegúrate de tener la última versión del código:
-   `git checkout main`
-   `git pull origin main`
+---
 
-2. **Crear una nueva rama por tarea:**
-   Crea y cámbiate a una rama descriptiva para la función que vas a implementar:
-   `git checkout -b feature/nombre-de-la-tarea`
-   *(Ejemplo: `git checkout -b feature/login-usuario`)*
+##  Instalación y Ejecución (Paso a Paso)
 
-3. **Guardar y subir tus cambios:**
-   Una vez completados y probados tus cambios locales:
-   `git add .`
-   `git commit -m "Descripción de los cambios realizados"`
-   `git push origin feature/nombre-de-la-tarea`
+### 1. Clonar el repositorio
+```bash
+git clone [https://github.com/jonhwill1209-wq/lila-joyeria.git](https://github.com/jonhwill1209-wq/lila-joyeria.git)
+```
 
-4. **Solicitar la integración (Pull Request):**
-   * Ve al repositorio en GitHub: [https://github.com/jonhwill1209-wq/lila-joyeria](https://github.com/jonhwill1209-wq/lila-joyeria)
-   * Crea un **Pull Request (PR)** desde tu rama hacia la rama `main`.
-   * Solicita la revisión a un compañero de equipo antes de realizar el *merge*.
+### 2. Configuración de la Base de Datos
+1. Abre MySQL Workbench.
+2. Ejecuta el script SQL ubicado en `recursos_db/lila_joyeria_schema.sql`.
+   *(Este script creará la base de datos `lila_joyeria`, las tablas correspondientes y registros base).*
+
+### 3. Configuración de Credenciales
+1. Ve a la ruta `src/main/resources/database.properties`.
+2. Edita el archivo con tus credenciales locales de MySQL:
+```properties
+db.url=jdbc:mysql://localhost:3306/lila_joyeria?useSSL=false&serverTimezone=UTC
+db.user=tu_usuario_local
+db.password=tu_contraseña_local
+db.driver=com.mysql.cj.jdbc.Driver
+```
+
+### 4. Despliegue
+1. Abre el proyecto en tu IDE como **Proyecto Maven** y actualiza las dependencias (el `pom.xml` descargará el conector de MySQL y las librerías Jakarta automáticamente).
+2. Configura tu servidor **Apache Tomcat 10** apuntando al proyecto.
+3. Ejecuta el servidor. La aplicación estará disponible por defecto en: `http://localhost:8080/lila-joyeria`
+
+---
+
+##  Flujo de Trabajo Git (Gitflow)
+
+Este proyecto utiliza un flujo de trabajo basado en ramas para asegurar la trazabilidad del código y un proceso profesional:
+
+* **`main`**: Rama de producción (Solo contiene código estable y evaluable).
+* **`develop`**: Rama de integración (Todos los Pull Requests se hacen hacia esta rama).
+* **`feature/*`**: Ramas de desarrollo individuales por cada integrante (ej. `feature/vistas-jsp`).
+
+---
+
+##  Estructura del Proyecto
+
+```text
+src/
+ ├── main/
+ │   ├── java/com/lilajoyeria/
+ │   │   ├── controller/  # Servlets (Lógica de negocio y rutas)
+ │   │   ├── dao/          # Data Access Objects (Conexión a BD)
+ │   │   ├── model/       # Clases de dominio (POJOs)
+ │   │   └── util/   # Configuración y conexión a BD
+ │   ├── resources/
+ │   │   └── database.properties # Credenciales DB
+ │   └── webapp/           # Archivos JSP, CSS, JS, Imágenes
+ └── recursos_db/          # Script de la base de datos (.sql)
+```
