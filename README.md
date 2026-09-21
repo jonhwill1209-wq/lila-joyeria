@@ -16,7 +16,6 @@ Este proyecto ha sido desarrollado como parte de la asignatura **DESARROLLO DE A
 
 ##  Equipo de Desarrollo
 
-*Nota: Al ser 4 integrantes, se han distribuido los 5 roles técnicos para cubrir toda la arquitectura.*
 
 1. **Jonathan Wilfredo Bonilla Erazo (MM120518)**  
 2. **Norma Susana García Galdamez (GG253588)**    
