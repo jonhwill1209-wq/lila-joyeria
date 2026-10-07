@@ -1,17 +1,31 @@
 package com.lilajoyeria.model;
 
+import jakarta.persistence.*;
+
 import java.math.BigDecimal;
 
-public class Joya {
+@Entity
+@Table(name = "joyas")
+public class Joya implements java.io.Serializable {
+    private static final long serialVersionUID = 1L;
 
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Column(name = "id_joya")
     private int idJoya;
+    @Column(nullable = false, length = 100)
     private String nombre;
+    @Column(columnDefinition = "TEXT")
     private String descripcion;
+    @Column(nullable = false, length = 50)
     private String material;
+    @Column(precision = 4, scale = 2)
     private BigDecimal quilates;
+    @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal precio;
+    @Column(nullable = false)
     private int stock;
+    @Column(length = 150)
     private String imagen;
+    @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "id_categoria")
     private Categoria categoria;
 
     public Joya() {

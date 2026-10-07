@@ -1,11 +1,21 @@
 package com.lilajoyeria.model;
 
-public class Usuario {
+import jakarta.persistence.*;
 
+@Entity
+@Table(name = "usuarios")
+public class Usuario implements java.io.Serializable {
+    private static final long serialVersionUID = 1L;
+
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Column(name = "id_usuario")
     private int idUsuario;
+    @Column(nullable = false, length = 100)
     private String nombre;
+    @Column(nullable = false, unique = true, length = 100)
     private String email;
+    @Column(nullable = false, length = 255)
     private String password;
+    @Enumerated(EnumType.STRING) @Column(length = 7)
     private RolUsuario rol = RolUsuario.CLIENTE;
 
     public Usuario() {

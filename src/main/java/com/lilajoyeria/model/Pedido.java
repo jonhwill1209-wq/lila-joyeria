@@ -1,17 +1,28 @@
 package com.lilajoyeria.model;
 
+import jakarta.persistence.*;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Pedido {
+@Entity
+@Table(name = "pedidos")
+public class Pedido implements java.io.Serializable {
+    private static final long serialVersionUID = 1L;
 
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Column(name = "id_pedido")
     private int idPedido;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false) @JoinColumn(name = "id_usuario", nullable = false)
     private Usuario usuario;
+    @Column(name = "fecha_pedido")
     private LocalDateTime fechaPedido;
+    @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal total;
+    @Enumerated(EnumType.STRING) @Column(length = 9)
     private EstadoPedido estado;
+    @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true) @OrderBy("idDetalle ASC")
     private List<DetallePedido> detalles = new ArrayList<>();
 
     public Pedido() {
@@ -107,7 +118,7 @@ public class Pedido {
     }
 
     public void setDetalles(List<DetallePedido> detalles) {
-        this.detalles = new ArrayList<>();
+        this.detalles.clear();
 
         if (detalles != null) {
             for (DetallePedido detalle : detalles) {
