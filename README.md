@@ -88,3 +88,18 @@ src/
  │   └── webapp/           # Archivos JSP, CSS, JS, Imágenes
  └── recursos_db/          # Script de la base de datos (.sql)
 ```
+
+
+## Incremento Persona 1: JPA / Hibernate
+
+La capa de persistencia utiliza Hibernate ORM, Jakarta Persistence y HikariCP sobre
+MySQL. Incluye cinco entidades mapeadas, DAOs con consultas JPQL, transacciones
+at?micas para pedidos y detalles, y cierre del EntityManager por operaci?n.
+
+Las credenciales de `database.properties` siguen siendo compatibles. Tambi?n se
+pueden configurar `DB_URL`, `DB_USER` y `DB_PASSWORD` en el entorno de Tomcat.
+La unidad `lilaJoyeriaPU` valida el esquema existente y no modifica tablas.
+
+Ejecutar `mvn clean package` para probar y generar `target/lila-joyeria.war`.
+Las cuatro pruebas JUnit usan H2; las pruebas de integraci?n MySQL y las decisiones
+para la defensa t?cnica se describen en [Persona 1: persistencia](docs/persona-1-persistencia.md).
