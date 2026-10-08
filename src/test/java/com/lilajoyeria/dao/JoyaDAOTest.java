@@ -38,6 +38,7 @@ public class JoyaDAOTest {
                     new BigDecimal("18.00"),
                     new BigDecimal("125.50"),
                     3,
+                    "sin-imagen.jpg",
                     categoria
             );
 

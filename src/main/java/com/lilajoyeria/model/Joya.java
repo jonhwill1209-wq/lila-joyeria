@@ -1,16 +1,31 @@
 package com.lilajoyeria.model;
 
+import jakarta.persistence.*;
+
 import java.math.BigDecimal;
 
-public class Joya {
+@Entity
+@Table(name = "joyas")
+public class Joya implements java.io.Serializable {
+    private static final long serialVersionUID = 1L;
 
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Column(name = "id_joya")
     private int idJoya;
+    @Column(nullable = false, length = 100)
     private String nombre;
+    @Column(columnDefinition = "TEXT")
     private String descripcion;
+    @Column(nullable = false, length = 50)
     private String material;
+    @Column(precision = 4, scale = 2)
     private BigDecimal quilates;
+    @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal precio;
+    @Column(nullable = false)
     private int stock;
+    @Column(length = 150)
+    private String imagen;
+    @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "id_categoria")
     private Categoria categoria;
 
     public Joya() {
@@ -18,19 +33,20 @@ public class Joya {
 
     public Joya(String nombre, String descripcion, String material,
                 BigDecimal quilates, BigDecimal precio, int stock,
-                Categoria categoria) {
+                String imagen, Categoria categoria) {
         setNombre(nombre);
         setDescripcion(descripcion);
         setMaterial(material);
         setQuilates(quilates);
         setPrecio(precio);
         setStock(stock);
+        setImagen(imagen);
         setCategoria(categoria);
     }
 
     public Joya(int idJoya, String nombre, String descripcion,
                 String material, BigDecimal quilates, BigDecimal precio,
-                int stock, Categoria categoria) {
+                int stock, String imagen, Categoria categoria) {
         setIdJoya(idJoya);
         setNombre(nombre);
         setDescripcion(descripcion);
@@ -38,6 +54,7 @@ public class Joya {
         setQuilates(quilates);
         setPrecio(precio);
         setStock(stock);
+        setImagen(imagen);
         setCategoria(categoria);
     }
 
@@ -145,6 +162,16 @@ public class Joya {
         this.stock = stock;
     }
 
+    public String getImagen() {
+        return imagen;
+    }
+
+    public void setImagen(String imagen) {
+        this.imagen = (imagen == null || imagen.trim().isEmpty())
+                ? "sin-imagen.jpg"
+                : imagen.trim();
+    }
+
     public Categoria getCategoria() {
         return categoria;
     }
@@ -163,6 +190,7 @@ public class Joya {
                 ", quilates=" + quilates +
                 ", precio=" + precio +
                 ", stock=" + stock +
+                ", imagen='" + imagen + '\'' +
                 ", categoria=" + categoria +
                 '}';
     }
