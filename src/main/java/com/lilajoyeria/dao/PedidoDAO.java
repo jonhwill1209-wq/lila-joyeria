@@ -30,6 +30,11 @@ public class PedidoDAO {
                     "INNER JOIN usuarios u " +
                     "ON p.id_usuario = u.id_usuario ";
 
+    private static final String SQL_DESCONTAR_STOCK =
+            "UPDATE joyas " +
+                    "SET stock = stock - ? " +
+                    "WHERE id_joya = ? AND stock >= ?";
+
     private static final String SQL_BUSCAR_POR_ID =
             CONSULTA_PEDIDO_BASE +
                     "WHERE p.id_pedido = ?";
@@ -107,7 +112,11 @@ public class PedidoDAO {
                 insertarDetalles(
                         conexion,
                         pedido
+
+
                 );
+
+                descontarInventario(conexion, pedido);
 
                 conexion.commit();
 
@@ -288,6 +297,46 @@ public class PedidoDAO {
 
             } finally {
                 intentarRestaurarAutoCommit(conexion);
+            }
+        }
+    }
+
+    private void descontarInventario(
+            Connection conexion,
+            Pedido pedido) throws SQLException {
+
+        try (PreparedStatement sentencia =
+                     conexion.prepareStatement(
+                             SQL_DESCONTAR_STOCK
+                     )) {
+
+            for (DetallePedido detalle :
+                    pedido.getDetalles()) {
+
+                sentencia.setInt(
+                        1,
+                        detalle.getCantidad()
+                );
+
+                sentencia.setInt(
+                        2,
+                        detalle.getJoya().getIdJoya()
+                );
+
+                sentencia.setInt(
+                        3,
+                        detalle.getCantidad()
+                );
+
+                int filasAfectadas =
+                        sentencia.executeUpdate();
+
+                if (filasAfectadas == 0) {
+                    throw new SQLException(
+                            "No hay inventario suficiente para " +
+                                    detalle.getJoya().getNombre()
+                    );
+                }
             }
         }
     }
