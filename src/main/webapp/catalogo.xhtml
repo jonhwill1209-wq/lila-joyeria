@@ -10,6 +10,12 @@
     <h1>Catálogo de joyas</h1>
 
     <h:form>
+
+        <h:commandButton value="Cerrar sesión"
+                         action="#{authBean.cerrarSesion}" />
+
+        <br />
+        <br />
         <h:messages showDetail="true" />
 
         <h:dataTable value="#{catalogoBean.joyas}"
