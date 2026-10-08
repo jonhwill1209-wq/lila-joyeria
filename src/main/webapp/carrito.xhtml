@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core">
+<h:head>
+    <title>Carrito</title>
+</h:head>
+
+<h:body>
+    <h1>Mi carrito</h1>
+
+    <h:messages showDetail="true" />
+
+    <h:form>
+        <h:dataTable value="#{carritoBean.carrito.detalles}"
+                     var="detalle"
+                     border="1">
+
+            <h:column>
+                <f:facet name="header">Producto</f:facet>
+                #{detalle.joya.nombre}
+            </h:column>
+
+            <h:column>
+                <f:facet name="header">Precio</f:facet>
+                $#{detalle.precioUnitario}
+            </h:column>
+
+            <h:column>
+                <f:facet name="header">Cantidad</f:facet>
+                #{detalle.cantidad}
+            </h:column>
+
+            <h:column>
+                <f:facet name="header">Subtotal</f:facet>
+                $#{detalle.calcularSubtotal()}
+            </h:column>
+
+            <h:column>
+                <f:facet name="header">Acción</f:facet>
+                <h:commandButton value="Eliminar"
+                                 action="#{carritoBean.eliminar(detalle)}" />
+            </h:column>
+        </h:dataTable>
+
+        <h2>Total: $#{carritoBean.total}</h2>
+
+        <h:commandButton value="Vaciar carrito"
+                         action="#{carritoBean.vaciar}" />
+    </h:form>
+
+    <br />
+
+    <h:link value="Volver al catálogo" outcome="catalogo" />
+</h:body>
+</html>
