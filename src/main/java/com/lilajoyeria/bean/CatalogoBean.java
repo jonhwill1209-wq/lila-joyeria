@@ -29,6 +29,7 @@ public class CatalogoBean implements Serializable {
     public void cargarJoyas() {
         try {
             joyas = joyaDAO.listar();
+
         } catch (Exception e) {
             FacesContext.getCurrentInstance().addMessage(
                     null,

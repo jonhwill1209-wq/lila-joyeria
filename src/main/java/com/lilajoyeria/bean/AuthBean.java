@@ -39,6 +39,7 @@ public class AuthBean implements Serializable {
                     )
             );
         } catch (Exception e) {
+
             FacesContext.getCurrentInstance().addMessage(
                     null,
                     new FacesMessage(

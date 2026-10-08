@@ -64,4 +64,3 @@ Implementar los Managed Beans de JSF y las reglas de negocio para autenticación
 
 - Reemplazar las vistas temporales por las páginas XHTML finales de Persona 3.
 - Integrar AJAX, validadores y convertidores de Persona 4.
-- Integrar la versión JPA/Hibernate de la capa de persistencia desarrollada por Persona 1.
