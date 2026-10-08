@@ -5,7 +5,8 @@ import jakarta.persistence.EntityManagerFactory;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
-
+import jakarta.persistence.LockModeType;
+import jakarta.persistence.PersistenceException;
 /** Pedido es la raíz del agregado: detalles se escriben y eliminan con él. */
 public class PedidoDAO extends JpaDAO {
     private static final String CONSULTA = "SELECT DISTINCT p FROM Pedido p JOIN FETCH p.usuario "
@@ -15,19 +16,54 @@ public class PedidoDAO extends JpaDAO {
 
     public int guardar(Pedido pedido) throws SQLException {
         validar(pedido);
-        if (pedido.getIdPedido() != 0) throw new IllegalArgumentException("El pedido ya tiene identificador");
+
+        if (pedido.getIdPedido() != 0) {
+            throw new IllegalArgumentException(
+                    "El pedido ya tiene identificador"
+            );
+        }
+
         pedido.calcularTotal();
+
         return ejecutar(true, em -> {
-            pedido.setUsuario(em.getReference(Usuario.class, pedido.getUsuario().getIdUsuario()));
+            pedido.setUsuario(
+                    em.getReference(
+                            Usuario.class,
+                            pedido.getUsuario().getIdUsuario()
+                    )
+            );
+
             for (DetallePedido detalle : pedido.getDetalles()) {
+                Joya joya = em.find(
+                        Joya.class,
+                        detalle.getJoya().getIdJoya(),
+                        LockModeType.PESSIMISTIC_WRITE
+                );
+
+                if (joya == null ||
+                        joya.getStock() < detalle.getCantidad()) {
+
+                    throw new PersistenceException(
+                            "No hay inventario suficiente para " +
+                                    detalle.getJoya().getNombre()
+                    );
+                }
+
+                joya.setStock(
+                        joya.getStock() - detalle.getCantidad()
+                );
+
                 detalle.setPedido(pedido);
-                detalle.setJoya(em.getReference(Joya.class, detalle.getJoya().getIdJoya()));
+                detalle.setJoya(joya);
             }
+
             em.persist(pedido);
             em.flush();
+
             return pedido.getIdPedido();
         });
     }
+
     public Pedido buscarPorId(int idPedido) throws SQLException {
         return ejecutar(false, em -> em.createQuery(CONSULTA + " WHERE p.idPedido = :id", Pedido.class)
                 .setParameter("id", idPedido).getResultStream().findFirst().orElse(null));

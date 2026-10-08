@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core">
+
+<h:head>
+    <title>Catálogo</title>
+</h:head>
+
+<h:body>
+    <h1>Catálogo de joyas</h1>
+
+    <h:form>
+
+        <h:commandButton value="Cerrar sesión"
+                         action="#{authBean.cerrarSesion}" />
+
+        <br />
+        <br />
+        <h:messages showDetail="true" />
+
+        <h:dataTable value="#{catalogoBean.joyas}"
+                     var="joya"
+                     border="1">
+
+            <h:column>
+                <f:facet name="header">Nombre</f:facet>
+                #{joya.nombre}
+            </h:column>
+
+            <h:column>
+                <f:facet name="header">Precio</f:facet>
+                $#{joya.precio}
+            </h:column>
+
+            <h:column>
+                <f:facet name="header">Stock</f:facet>
+                #{joya.stock}
+            </h:column>
+
+            <h:column>
+                <f:facet name="header">Acción</f:facet>
+                <h:commandButton value="Agregar al carrito"
+                                 action="#{carritoBean.agregar(joya)}" />
+            </h:column>
+        </h:dataTable>
+
+        <br />
+
+        <h:link value="Ver carrito" outcome="carrito" />
+    </h:form>
+</h:body>
+</html>
