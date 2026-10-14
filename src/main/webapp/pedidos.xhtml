@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="jakarta.faces.html"
+        xmlns:f="jakarta.faces.core"
+        xmlns:ui="jakarta.faces.facelets"
+        xmlns:pt="jakarta.faces.passthrough"
+        template="/WEB-INF/templates/plantilla.xhtml">
+
+    <ui:define name="titulo">#{authBean.admin ? 'Pedidos' : 'Mis pedidos'}</ui:define>
+
+    <ui:define name="contenido">
+        <div class="contenedor">
+            <section class="admin-seccion">
+
+                <div class="admin-cabecera">
+                    <h2>
+                        <h:outputText value="#{authBean.admin ? 'Administrar pedidos' : 'Mis pedidos'}" />
+                    </h2>
+                </div>
+
+                <!-- Filtros -->
+                <h:form id="formFiltros" styleClass="barra-filtros">
+
+                    <div class="grupo-formulario">
+                        <h:outputLabel for="filtroEstado" value="Estado" />
+                        <h:selectOneMenu id="filtroEstado"
+                                         value="#{pedidosBean.filtroEstado}">
+                            <f:selectItem itemLabel="Todos"
+                                          itemValue="#{null}"
+                                          noSelectionOption="true" />
+                            <f:selectItems value="#{pedidosBean.estados}"
+                                           var="e"
+                                           itemValue="#{e}"
+                                           itemLabel="#{e}" />
+                        </h:selectOneMenu>
+                    </div>
+
+                    <!-- Solo el administrador filtra por cliente -->
+                    <h:panelGroup layout="block"
+                                  styleClass="grupo-formulario"
+                                  rendered="#{authBean.admin}">
+                        <h:outputLabel for="filtroCliente" value="Cliente" />
+                        <h:inputText id="filtroCliente"
+                                     value="#{pedidosBean.filtroCliente}"
+                                     pt:placeholder="Nombre o correo" />
+                    </h:panelGroup>
+
+                    <div class="acciones-filtro">
+                        <h:commandButton value="Filtrar"
+                                         action="#{pedidosBean.filtrar}"
+                                         styleClass="boton-formulario" />
+                        <h:commandButton value="Limpiar"
+                                         action="#{pedidosBean.limpiarFiltros}"
+                                         styleClass="boton-formulario boton-secundario" />
+                    </div>
+                </h:form>
+
+                <!-- Tabla -->
+                <h:form id="formTabla">
+                    <div class="tabla-contenedor">
+                        <h:dataTable id="tablaPedidos"
+                                     value="#{pedidosBean.pedidos}"
+                                     var="pedido"
+                                     styleClass="tabla-datos"
+                                     rendered="#{not empty pedidosBean.pedidos}">
+
+                            <h:column>
+                                <f:facet name="header">N.º</f:facet>
+                                <h:outputText value="#{pedido.idPedido}" />
+                            </h:column>
+
+                            <h:column>
+                                <f:facet name="header">Fecha</f:facet>
+                                <h:outputText value="#{pedido.fechaPedido}">
+                                    <f:convertDateTime type="localDateTime"
+                                                       pattern="dd/MM/yyyy HH:mm" />
+                                </h:outputText>
+                            </h:column>
+
+                            <h:column rendered="#{authBean.admin}">
+                                <f:facet name="header">Cliente</f:facet>
+                                <h:outputText value="#{pedido.usuario.nombre}" />
+                                <br />
+                                <small><h:outputText value="#{pedido.usuario.email}" /></small>
+                            </h:column>
+
+                            <h:column>
+                                <f:facet name="header">Productos</f:facet>
+                                <ui:repeat value="#{pedido.detalles}" var="detalle">
+                                    <div>
+                                        <h:outputText value="#{detalle.joya.nombre}" />
+                                        × <h:outputText value="#{detalle.cantidad}" />
+                                    </div>
+                                </ui:repeat>
+                            </h:column>
+
+                            <h:column>
+                                <f:facet name="header">Total</f:facet>
+                                <h:outputText value="#{pedido.total}">
+                                    <f:convertNumber type="currency"
+                                                     currencySymbol="$"
+                                                     locale="en_US" />
+                                </h:outputText>
+                            </h:column>
+
+                            <!-- Cliente: estado en solo lectura -->
+                            <h:column rendered="#{not authBean.admin}">
+                                <f:facet name="header">Estado</f:facet>
+                                <h:outputText value="#{pedido.estado}"
+                                              styleClass="badge estado-#{pedido.estado}" />
+                            </h:column>
+
+                            <!-- Administrador: estado editable -->
+                            <h:column rendered="#{authBean.admin}">
+                                <f:facet name="header">Estado</f:facet>
+                                <h:selectOneMenu value="#{pedido.estado}">
+                                    <f:selectItems value="#{pedidosBean.estados}"
+                                                   var="e"
+                                                   itemValue="#{e}"
+                                                   itemLabel="#{e}" />
+                                </h:selectOneMenu>
+                            </h:column>
+
+                            <h:column rendered="#{authBean.admin}">
+                                <f:facet name="header">Acciones</f:facet>
+                                <h:commandButton value="Guardar"
+                                                 action="#{pedidosBean.guardarEstado(pedido)}"
+                                                 styleClass="boton-tabla" />
+                                <h:commandButton value="Eliminar"
+                                                 action="#{pedidosBean.eliminar(pedido)}"
+                                                 onclick="return confirm('¿Seguro que deseas eliminar este pedido?');"
+                                                 styleClass="boton-tabla boton-peligro"
+                                                 rendered="#{pedido.estado == 'PENDIENTE'}" />
+                            </h:column>
+                        </h:dataTable>
+                    </div>
+
+                    <h:panelGroup layout="block"
+                                  styleClass="mensaje-info"
+                                  rendered="#{empty pedidosBean.pedidos}">
+                        No hay pedidos para mostrar.
+                    </h:panelGroup>
+                </h:form>
+
+            </section>
+        </div>
+    </ui:define>
+</ui:composition>

@@ -1,53 +1,134 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="jakarta.faces.html"
-      xmlns:f="jakarta.faces.core">
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="jakarta.faces.html"
+        xmlns:f="jakarta.faces.core"
+        xmlns:ui="jakarta.faces.facelets"
+        xmlns:pt="jakarta.faces.passthrough"
+        template="/WEB-INF/templates/plantilla.xhtml">
 
-<h:head>
-    <title>Catálogo</title>
-</h:head>
+    <ui:define name="titulo">Catálogo</ui:define>
 
-<h:body>
-    <h1>Catálogo de joyas</h1>
+    <ui:define name="contenido">
+        <div class="contenedor">
+            <section class="catalogo-seccion">
 
-    <h:form>
+                <h2>Catálogo de Joyas</h2>
+                <p class="catalogo-descripcion">
+                    Explora algunos de nuestros productos disponibles.
+                </p>
 
-        <h:commandButton value="Cerrar sesión"
-                         action="#{authBean.cerrarSesion}" />
+                <!-- Filtros -->
+                <h:form id="formFiltros" styleClass="barra-filtros">
 
-        <br />
-        <br />
-        <h:messages showDetail="true" />
+                    <div class="grupo-formulario">
+                        <h:outputLabel for="texto" value="Buscar" />
+                        <h:inputText id="texto"
+                                     value="#{catalogoBean.texto}"
+                                     pt:placeholder="Nombre, material o descripción" />
+                    </div>
 
-        <h:dataTable value="#{catalogoBean.joyas}"
-                     var="joya"
-                     border="1">
+                    <div class="grupo-formulario">
+                        <h:outputLabel for="categoria" value="Categoría" />
+                        <h:selectOneMenu id="categoria"
+                                         value="#{catalogoBean.idCategoria}">
+                            <f:selectItem itemLabel="Todas las categorías"
+                                          itemValue="#{null}"
+                                          noSelectionOption="true" />
+                            <f:selectItems value="#{catalogoBean.categorias}"
+                                           var="c"
+                                           itemValue="#{c.idCategoria}"
+                                           itemLabel="#{c.nombre}" />
+                        </h:selectOneMenu>
+                    </div>
 
-            <h:column>
-                <f:facet name="header">Nombre</f:facet>
-                #{joya.nombre}
-            </h:column>
+                    <div class="check-filtro">
+                        <h:selectBooleanCheckbox id="disponibles"
+                                                 value="#{catalogoBean.soloDisponibles}" />
+                        <h:outputLabel for="disponibles" value="Solo disponibles" />
+                    </div>
 
-            <h:column>
-                <f:facet name="header">Precio</f:facet>
-                $#{joya.precio}
-            </h:column>
+                    <div class="acciones-filtro">
+                        <h:commandButton value="Filtrar"
+                                         action="#{catalogoBean.filtrar}"
+                                         styleClass="boton-formulario" />
+                        <h:commandButton value="Limpiar"
+                                         action="#{catalogoBean.limpiar}"
+                                         styleClass="boton-formulario boton-secundario" />
+                    </div>
+                </h:form>
 
-            <h:column>
-                <f:facet name="header">Stock</f:facet>
-                #{joya.stock}
-            </h:column>
+                <!-- Productos -->
+                <h:form id="formProductos">
+                    <div class="lista-productos">
 
-            <h:column>
-                <f:facet name="header">Acción</f:facet>
-                <h:commandButton value="Agregar al carrito"
-                                 action="#{carritoBean.agregar(joya)}" />
-            </h:column>
-        </h:dataTable>
+                        <ui:repeat value="#{catalogoBean.joyas}" var="joya">
+                            <article class="producto">
 
-        <br />
+                                <h:graphicImage value="/img/productos/#{joya.imagen}"
+                                                alt="#{joya.nombre}"
+                                                styleClass="producto-imagen" />
 
-        <h:link value="Ver carrito" outcome="carrito" />
-    </h:form>
-</h:body>
-</html>
+                                <h3><h:outputText value="#{joya.nombre}" /></h3>
+
+                                <h:panelGroup rendered="#{not empty joya.descripcion}">
+                                    <p><h:outputText value="#{joya.descripcion}" /></p>
+                                </h:panelGroup>
+
+                                <p>
+                                    <strong>Categoría:</strong>
+                                    <h:outputText value="#{not empty joya.categoria ? joya.categoria.nombre : 'Sin categoría'}" />
+                                </p>
+
+                                <p>
+                                    <strong>Material:</strong>
+                                    <h:outputText value="#{joya.material}" />
+                                </p>
+
+                                <h:panelGroup rendered="#{not empty joya.quilates}">
+                                    <p>
+                                        <strong>Quilates:</strong>
+                                        <h:outputText value="#{joya.quilates}" />
+                                    </p>
+                                </h:panelGroup>
+
+                                <p>
+                                    <strong>Precio:</strong>
+                                    <h:outputText value="#{joya.precio}">
+                                        <f:convertNumber type="currency"
+                                                         currencySymbol="$"
+                                                         locale="en_US" />
+                                    </h:outputText>
+                                </p>
+
+                                <p>
+                                    <strong>Stock:</strong>
+                                    <h:outputText value="#{joya.stock}" /> unidades
+                                </p>
+
+                                <!-- El administrador consulta el catálogo pero no compra -->
+                                <h:commandButton value="Agregar al carrito"
+                                                 action="#{carritoBean.agregar(joya)}"
+                                                 styleClass="boton-carrito"
+                                                 rendered="#{joya.stock gt 0 and not authBean.admin}" />
+
+                                <h:panelGroup rendered="#{joya.stock le 0}">
+                                    <p><strong>Producto agotado</strong></p>
+                                </h:panelGroup>
+
+                            </article>
+                        </ui:repeat>
+
+                        <h:panelGroup layout="block"
+                                      styleClass="mensaje-info"
+                                      rendered="#{empty catalogoBean.joyas}">
+                            No hay joyas que coincidan con tu búsqueda.
+                        </h:panelGroup>
+
+                    </div>
+                </h:form>
+
+            </section>
+        </div>
+    </ui:define>
+</ui:composition>

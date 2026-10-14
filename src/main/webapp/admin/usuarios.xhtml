@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="jakarta.faces.html"
+        xmlns:f="jakarta.faces.core"
+        xmlns:ui="jakarta.faces.facelets"
+        xmlns:pt="jakarta.faces.passthrough"
+        template="/WEB-INF/templates/plantilla.xhtml">
+
+    <ui:define name="titulo">Administrar usuarios</ui:define>
+
+    <ui:define name="contenido">
+        <div class="contenedor">
+            <section class="admin-seccion">
+
+                <div class="admin-cabecera">
+                    <h2>Administrar usuarios</h2>
+                </div>
+
+                <!-- Edición -->
+                <h:form id="formEdicion"
+                        styleClass="panel-edicion"
+                        rendered="#{usuarioAdminBean.formularioVisible}">
+
+                    <h3>Editar usuario</h3>
+
+                    <div class="grupo-formulario">
+                        <h:outputLabel for="nombre" value="Nombre" />
+                        <h:inputText id="nombre"
+                                     value="#{usuarioAdminBean.nombre}"
+                                     required="true"
+                                     requiredMessage="El nombre es obligatorio."
+                                     maxlength="100" />
+                    </div>
+
+                    <div class="grupo-formulario">
+                        <h:outputLabel for="correo" value="Correo electrónico" />
+                        <h:inputText id="correo"
+                                     value="#{usuarioAdminBean.correo}"
+                                     required="true"
+                                     requiredMessage="El correo es obligatorio."
+                                     maxlength="100"
+                                     pt:type="email" />
+                    </div>
+
+                    <div class="grupo-formulario">
+                        <h:outputLabel for="rol" value="Rol" />
+                        <h:selectOneMenu id="rol"
+                                         value="#{usuarioAdminBean.rol}"
+                                         required="true"
+                                         requiredMessage="Selecciona un rol.">
+                            <f:selectItems value="#{usuarioAdminBean.roles}"
+                                           var="r"
+                                           itemValue="#{r}"
+                                           itemLabel="#{r}" />
+                        </h:selectOneMenu>
+                    </div>
+
+                    <div class="acciones-form">
+                        <h:commandButton value="Guardar"
+                                         action="#{usuarioAdminBean.guardar}"
+                                         styleClass="boton-formulario" />
+                        <h:commandButton value="Cancelar"
+                                         action="#{usuarioAdminBean.cancelar}"
+                                         immediate="true"
+                                         styleClass="boton-formulario boton-secundario" />
+                    </div>
+                </h:form>
+
+                <!-- Filtros -->
+                <h:form id="formFiltros" styleClass="barra-filtros">
+
+                    <div class="grupo-formulario">
+                        <h:outputLabel for="filtroTexto" value="Buscar" />
+                        <h:inputText id="filtroTexto"
+                                     value="#{usuarioAdminBean.filtroTexto}"
+                                     pt:placeholder="Nombre o correo" />
+                    </div>
+
+                    <div class="grupo-formulario">
+                        <h:outputLabel for="filtroRol" value="Rol" />
+                        <h:selectOneMenu id="filtroRol"
+                                         value="#{usuarioAdminBean.filtroRol}">
+                            <f:selectItem itemLabel="Todos"
+                                          itemValue="#{null}"
+                                          noSelectionOption="true" />
+                            <f:selectItems value="#{usuarioAdminBean.roles}"
+                                           var="r"
+                                           itemValue="#{r}"
+                                           itemLabel="#{r}" />
+                        </h:selectOneMenu>
+                    </div>
+
+                    <div class="acciones-filtro">
+                        <h:commandButton value="Filtrar"
+                                         action="#{usuarioAdminBean.filtrar}"
+                                         styleClass="boton-formulario" />
+                        <h:commandButton value="Limpiar"
+                                         action="#{usuarioAdminBean.limpiarFiltros}"
+                                         styleClass="boton-formulario boton-secundario" />
+                    </div>
+                </h:form>
+
+                <p class="resumen-tabla">
+                    Mostrando <strong>#{usuarioAdminBean.usuarios.size()}</strong>
+                    de <strong>#{usuarioAdminBean.totalUsuarios}</strong> usuarios.
+                </p>
+
+                <!-- Tabla -->
+                <h:form id="formTabla">
+                    <div class="tabla-contenedor">
+                        <h:dataTable id="tablaUsuarios"
+                                     value="#{usuarioAdminBean.usuarios}"
+                                     var="usuario"
+                                     styleClass="tabla-datos"
+                                     rendered="#{not empty usuarioAdminBean.usuarios}">
+
+                            <h:column>
+                                <f:facet name="header">ID</f:facet>
+                                <h:outputText value="#{usuario.idUsuario}" />
+                            </h:column>
+
+                            <h:column>
+                                <f:facet name="header">Nombre</f:facet>
+                                <h:outputText value="#{usuario.nombre}" />
+                            </h:column>
+
+                            <h:column>
+                                <f:facet name="header">Correo</f:facet>
+                                <h:outputText value="#{usuario.email}" />
+                            </h:column>
+
+                            <h:column>
+                                <f:facet name="header">Rol</f:facet>
+                                <h:outputText value="#{usuario.rol}"
+                                              styleClass="badge #{usuario.rol == 'ADMIN' ? 'badge-admin' : ''}" />
+                            </h:column>
+
+                            <h:column>
+                                <f:facet name="header">Acciones</f:facet>
+                                <h:commandButton value="Editar"
+                                                 action="#{usuarioAdminBean.editar(usuario)}"
+                                                 styleClass="boton-tabla" />
+                                <h:commandButton value="Eliminar"
+                                                 action="#{usuarioAdminBean.eliminar(usuario)}"
+                                                 onclick="return confirm('¿Seguro que deseas eliminar este usuario?');"
+                                                 styleClass="boton-tabla boton-peligro"
+                                                 rendered="#{not usuarioAdminBean.esUsuarioActual(usuario.idUsuario)}" />
+                            </h:column>
+                        </h:dataTable>
+                    </div>
+
+                    <h:panelGroup layout="block"
+                                  styleClass="mensaje-info"
+                                  rendered="#{empty usuarioAdminBean.usuarios}">
+                        No hay usuarios que coincidan con los filtros.
+                    </h:panelGroup>
+                </h:form>
+
+            </section>
+        </div>
+    </ui:define>
+</ui:composition>
