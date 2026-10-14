@@ -1,9 +1,11 @@
 package com.lilajoyeria.bean;
 
 import com.lilajoyeria.dao.UsuarioDAO;
+import com.lilajoyeria.model.RolUsuario;
 import com.lilajoyeria.model.Usuario;
 import jakarta.enterprise.context.SessionScoped;
 import jakarta.faces.application.FacesMessage;
+import jakarta.faces.context.ExternalContext;
 import jakarta.faces.context.FacesContext;
 import jakarta.inject.Named;
 
@@ -14,6 +16,9 @@ import java.io.Serializable;
 public class AuthBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
+
+    /** Atributo de sesión que lee AccesoFilter para proteger las URL por rol. */
+    public static final String ATRIBUTO_ROL = "rolUsuario";
 
     private final UsuarioDAO usuarioDAO = new UsuarioDAO();
 
@@ -27,7 +32,11 @@ public class AuthBean implements Serializable {
             password = null;
 
             if (usuarioActual != null) {
-                return "catalogo?faces-redirect=true";
+                publicarRolEnSesion();
+
+                return usuarioActual.getRol() == RolUsuario.ADMIN
+                        ? "/admin/joyas?faces-redirect=true"
+                        : "catalogo?faces-redirect=true";
             }
 
             FacesContext.getCurrentInstance().addMessage(
@@ -64,6 +73,31 @@ public class AuthBean implements Serializable {
 
     public boolean isAutenticado() {
         return usuarioActual != null;
+    }
+
+    public boolean isAdmin() {
+        return usuarioActual != null
+                && usuarioActual.getRol() == RolUsuario.ADMIN;
+    }
+
+    public boolean isCliente() {
+        return usuarioActual != null
+                && usuarioActual.getRol() == RolUsuario.CLIENTE;
+    }
+
+    /** Actualiza la copia de sesión si el administrador edita su propio perfil. */
+    public void refrescarUsuario(Usuario usuario) {
+        if (usuarioActual != null && usuario != null
+                && usuarioActual.getIdUsuario() == usuario.getIdUsuario()) {
+            usuarioActual = usuario;
+        }
+    }
+
+    private void publicarRolEnSesion() {
+        ExternalContext externo =
+                FacesContext.getCurrentInstance().getExternalContext();
+
+        externo.getSessionMap().put(ATRIBUTO_ROL, usuarioActual.getRol());
     }
 
     public String getCorreo() {

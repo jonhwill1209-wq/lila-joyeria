@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="jakarta.faces.html"
+        xmlns:ui="jakarta.faces.facelets"
+        template="/WEB-INF/templates/plantilla.xhtml">
+
+    <ui:define name="titulo">Acceso denegado</ui:define>
+
+    <ui:define name="contenido">
+        <div class="contenedor">
+            <section class="formulario-seccion">
+                <h2>Acceso denegado</h2>
+                <p>No tienes permisos para ver esta página.</p>
+                <div class="enlace-alterno">
+                    <h:link outcome="catalogo" value="Volver al catálogo" styleClass="boton" />
+                </div>
+            </section>
+        </div>
+    </ui:define>
+</ui:composition>

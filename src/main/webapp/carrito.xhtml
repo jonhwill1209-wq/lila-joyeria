@@ -1,62 +1,98 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="jakarta.faces.html"
-      xmlns:f="jakarta.faces.core">
-<h:head>
-    <title>Carrito</title>
-</h:head>
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="jakarta.faces.html"
+        xmlns:f="jakarta.faces.core"
+        xmlns:ui="jakarta.faces.facelets"
+        template="/WEB-INF/templates/plantilla.xhtml">
 
-<h:body>
-    <h1>Mi carrito</h1>
+    <ui:define name="titulo">Carrito</ui:define>
 
-    <h:messages showDetail="true" />
+    <ui:define name="contenido">
+        <div class="contenedor">
+            <section class="carrito-seccion">
 
-    <h:form>
-        <h:dataTable value="#{carritoBean.carrito.detalles}"
-                     var="detalle"
-                     border="1">
+                <h2>Mi carrito</h2>
 
-            <h:column>
-                <f:facet name="header">Producto</f:facet>
-                #{detalle.joya.nombre}
-            </h:column>
+                <h:panelGroup layout="block"
+                              styleClass="mensaje-info"
+                              rendered="#{empty carritoBean.carrito.detalles}">
+                    El carrito está vacío.
+                    <h:link outcome="catalogo" value="Ir al catálogo" />
+                </h:panelGroup>
 
-            <h:column>
-                <f:facet name="header">Precio</f:facet>
-                $#{detalle.precioUnitario}
-            </h:column>
+                <h:form id="formCarrito"
+                        rendered="#{not empty carritoBean.carrito.detalles}">
 
-            <h:column>
-                <f:facet name="header">Cantidad</f:facet>
-                #{detalle.cantidad}
-            </h:column>
+                    <div class="tabla-contenedor">
+                        <h:dataTable value="#{carritoBean.carrito.detalles}"
+                                     var="detalle"
+                                     styleClass="tabla-carrito">
 
-            <h:column>
-                <f:facet name="header">Subtotal</f:facet>
-                $#{detalle.calcularSubtotal()}
-            </h:column>
+                            <h:column>
+                                <f:facet name="header">Producto</f:facet>
+                                <h:outputText value="#{detalle.joya.nombre}" />
+                            </h:column>
 
-            <h:column>
-                <f:facet name="header">Acción</f:facet>
-                <h:commandButton value="Eliminar"
-                                 action="#{carritoBean.eliminar(detalle)}" />
-            </h:column>
-        </h:dataTable>
+                            <h:column>
+                                <f:facet name="header">Precio</f:facet>
+                                <h:outputText value="#{detalle.precioUnitario}">
+                                    <f:convertNumber type="currency"
+                                                     currencySymbol="$"
+                                                     locale="en_US" />
+                                </h:outputText>
+                            </h:column>
 
-        <h2>Total: $#{carritoBean.total}</h2>
+                            <h:column>
+                                <f:facet name="header">Cantidad</f:facet>
+                                <h:outputText value="#{detalle.cantidad}" />
+                            </h:column>
 
-        <h:commandButton value="Vaciar carrito"
-                         action="#{carritoBean.vaciar}" />
+                            <h:column>
+                                <f:facet name="header">Subtotal</f:facet>
+                                <h:outputText value="#{detalle.calcularSubtotal()}">
+                                    <f:convertNumber type="currency"
+                                                     currencySymbol="$"
+                                                     locale="en_US" />
+                                </h:outputText>
+                            </h:column>
 
-        <br />
-        <br />
+                            <h:column>
+                                <f:facet name="header">Acción</f:facet>
+                                <h:commandButton value="Eliminar"
+                                                 action="#{carritoBean.eliminar(detalle)}"
+                                                 styleClass="boton-tabla boton-peligro" />
+                            </h:column>
+                        </h:dataTable>
+                    </div>
 
-        <h:commandButton value="Realizar pedido"
-                         action="#{pedidoBean.confirmarPedido}" />
-    </h:form>
+                    <div class="resumen-carrito">
+                        <h3>
+                            Total:
+                            <h:outputText value="#{carritoBean.total}">
+                                <f:convertNumber type="currency"
+                                                 currencySymbol="$"
+                                                 locale="en_US" />
+                            </h:outputText>
+                        </h3>
 
-    <br />
+                        <h:commandButton value="Vaciar carrito"
+                                         action="#{carritoBean.vaciar}"
+                                         styleClass="boton-formulario boton-secundario" />
 
-    <h:link value="Volver al catálogo" outcome="catalogo" />
-</h:body>
-</html>
+                        <h:commandButton value="Realizar pedido"
+                                         action="#{pedidoBean.confirmarPedido}"
+                                         styleClass="boton-formulario"
+                                         rendered="#{authBean.autenticado}" />
+
+                        <h:link outcome="login"
+                                value="Inicia sesión para realizar el pedido"
+                                styleClass="boton"
+                                rendered="#{not authBean.autenticado}" />
+                    </div>
+                </h:form>
+
+            </section>
+        </div>
+    </ui:define>
+</ui:composition>

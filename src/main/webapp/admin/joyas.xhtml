@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="jakarta.faces.html"
+        xmlns:f="jakarta.faces.core"
+        xmlns:ui="jakarta.faces.facelets"
+        xmlns:pt="jakarta.faces.passthrough"
+        template="/WEB-INF/templates/plantilla.xhtml">
+
+    <ui:define name="titulo">Administrar joyas</ui:define>
+
+    <ui:define name="contenido">
+        <div class="contenedor">
+            <section class="admin-seccion">
+
+                <div class="admin-cabecera">
+                    <h2>Administrar joyas</h2>
+                    <h:form id="formNueva">
+                        <h:commandButton value="Nueva joya"
+                                         action="#{joyaAdminBean.nueva}"
+                                         styleClass="boton-formulario" />
+                    </h:form>
+                </div>
+
+                <!-- Alta / edición -->
+                <h:form id="formEdicion"
+                        styleClass="panel-edicion"
+                        rendered="#{joyaAdminBean.formularioVisible}">
+
+                    <h3>
+                        <h:outputText value="#{joyaAdminBean.nuevaJoya ? 'Nueva joya' : 'Editar joya'}" />
+                    </h3>
+
+                    <div class="grupo-formulario">
+                        <h:outputLabel for="nombre" value="Nombre" />
+                        <h:inputText id="nombre"
+                                     value="#{joyaAdminBean.nombre}"
+                                     required="true"
+                                     requiredMessage="El nombre es obligatorio."
+                                     maxlength="100" />
+                    </div>
+
+                    <div class="grupo-formulario">
+                        <h:outputLabel for="categoria" value="Categoría" />
+                        <h:selectOneMenu id="categoria"
+                                         value="#{joyaAdminBean.idCategoria}">
+                            <f:selectItem itemLabel="Sin categoría"
+                                          itemValue="#{null}"
+                                          noSelectionOption="true" />
+                            <f:selectItems value="#{joyaAdminBean.categorias}"
+                                           var="c"
+                                           itemValue="#{c.idCategoria}"
+                                           itemLabel="#{c.nombre}" />
+                        </h:selectOneMenu>
+                    </div>
+
+                    <div class="grupo-formulario">
+                        <h:outputLabel for="material" value="Material" />
+                        <h:inputText id="material"
+                                     value="#{joyaAdminBean.material}"
+                                     required="true"
+                                     requiredMessage="El material es obligatorio."
+                                     maxlength="50" />
+                    </div>
+
+                    <div class="grupo-formulario">
+                        <h:outputLabel for="quilates" value="Quilates (opcional)" />
+                        <h:inputText id="quilates"
+                                     value="#{joyaAdminBean.quilates}"
+                                     converterMessage="Los quilates deben ser un número."
+                                     pt:inputmode="decimal" />
+                    </div>
+
+                    <div class="grupo-formulario">
+                        <h:outputLabel for="precio" value="Precio (USD)" />
+                        <h:inputText id="precio"
+                                     value="#{joyaAdminBean.precio}"
+                                     required="true"
+                                     requiredMessage="El precio es obligatorio."
+                                     converterMessage="El precio debe ser un número."
+                                     pt:inputmode="decimal" />
+                    </div>
+
+                    <div class="grupo-formulario">
+                        <h:outputLabel for="stock" value="Stock" />
+                        <h:inputText id="stock"
+                                     value="#{joyaAdminBean.stock}"
+                                     required="true"
+                                     requiredMessage="El stock es obligatorio."
+                                     converterMessage="El stock debe ser un número entero."
+                                     pt:inputmode="numeric" />
+                    </div>
+
+                    <div class="grupo-formulario campo-ancho">
+                        <h:outputLabel for="imagen" value="Imagen (archivo en img/productos)" />
+                        <h:inputText id="imagen"
+                                     value="#{joyaAdminBean.imagen}"
+                                     maxlength="150"
+                                     pt:placeholder="anillo1.jpeg" />
+                    </div>
+
+                    <div class="grupo-formulario campo-ancho">
+                        <h:outputLabel for="descripcion" value="Descripción" />
+                        <h:inputTextarea id="descripcion"
+                                         value="#{joyaAdminBean.descripcion}"
+                                         rows="3" />
+                    </div>
+
+                    <div class="acciones-form">
+                        <h:commandButton value="Guardar"
+                                         action="#{joyaAdminBean.guardar}"
+                                         styleClass="boton-formulario" />
+                        <!-- immediate: cancelar no debe exigir campos válidos -->
+                        <h:commandButton value="Cancelar"
+                                         action="#{joyaAdminBean.cancelar}"
+                                         immediate="true"
+                                         styleClass="boton-formulario boton-secundario" />
+                    </div>
+                </h:form>
+
+                <!-- Filtros -->
+                <h:form id="formFiltros" styleClass="barra-filtros">
+
+                    <div class="grupo-formulario">
+                        <h:outputLabel for="filtroTexto" value="Buscar" />
+                        <h:inputText id="filtroTexto"
+                                     value="#{joyaAdminBean.filtroTexto}"
+                                     pt:placeholder="Nombre, material o descripción" />
+                    </div>
+
+                    <div class="grupo-formulario">
+                        <h:outputLabel for="filtroCategoria" value="Categoría" />
+                        <h:selectOneMenu id="filtroCategoria"
+                                         value="#{joyaAdminBean.filtroCategoria}">
+                            <f:selectItem itemLabel="Todas"
+                                          itemValue="#{null}"
+                                          noSelectionOption="true" />
+                            <f:selectItems value="#{joyaAdminBean.categorias}"
+                                           var="c"
+                                           itemValue="#{c.idCategoria}"
+                                           itemLabel="#{c.nombre}" />
+                        </h:selectOneMenu>
+                    </div>
+
+                    <div class="check-filtro">
+                        <h:selectBooleanCheckbox id="stockBajo"
+                                                 value="#{joyaAdminBean.soloStockBajo}" />
+                        <h:outputLabel for="stockBajo" value="Solo stock bajo" />
+                    </div>
+
+                    <div class="acciones-filtro">
+                        <h:commandButton value="Filtrar"
+                                         action="#{joyaAdminBean.filtrar}"
+                                         styleClass="boton-formulario" />
+                        <h:commandButton value="Limpiar"
+                                         action="#{joyaAdminBean.limpiarFiltros}"
+                                         styleClass="boton-formulario boton-secundario" />
+                    </div>
+                </h:form>
+
+                <p class="resumen-tabla">
+                    Mostrando <strong>#{joyaAdminBean.joyas.size()}</strong>
+                    de <strong>#{joyaAdminBean.totalJoyas}</strong> joyas.
+                </p>
+
+                <!-- Tabla -->
+                <h:form id="formTabla">
+                    <div class="tabla-contenedor">
+                        <h:dataTable id="tablaJoyas"
+                                     value="#{joyaAdminBean.joyas}"
+                                     var="joya"
+                                     styleClass="tabla-datos"
+                                     rendered="#{not empty joyaAdminBean.joyas}">
+
+                            <h:column>
+                                <f:facet name="header">ID</f:facet>
+                                <h:outputText value="#{joya.idJoya}" />
+                            </h:column>
+
+                            <h:column>
+                                <f:facet name="header">Nombre</f:facet>
+                                <h:outputText value="#{joya.nombre}" />
+                            </h:column>
+
+                            <h:column>
+                                <f:facet name="header">Categoría</f:facet>
+                                <h:outputText value="#{not empty joya.categoria ? joya.categoria.nombre : '—'}" />
+                            </h:column>
+
+                            <h:column>
+                                <f:facet name="header">Material</f:facet>
+                                <h:outputText value="#{joya.material}" />
+                            </h:column>
+
+                            <h:column>
+                                <f:facet name="header">Precio</f:facet>
+                                <h:outputText value="#{joya.precio}">
+                                    <f:convertNumber type="currency"
+                                                     currencySymbol="$"
+                                                     locale="en_US" />
+                                </h:outputText>
+                            </h:column>
+
+                            <h:column>
+                                <f:facet name="header">Stock</f:facet>
+                                <h:outputText value="#{joya.stock}"
+                                              styleClass="#{joyaAdminBean.isStockBajo(joya) ? 'badge badge-alerta' : 'badge'}" />
+                            </h:column>
+
+                            <h:column>
+                                <f:facet name="header">Acciones</f:facet>
+                                <h:commandButton value="Editar"
+                                                 action="#{joyaAdminBean.editar(joya)}"
+                                                 styleClass="boton-tabla" />
+                                <h:commandButton value="Eliminar"
+                                                 action="#{joyaAdminBean.eliminar(joya)}"
+                                                 onclick="return confirm('¿Seguro que deseas eliminar esta joya?');"
+                                                 styleClass="boton-tabla boton-peligro" />
+                            </h:column>
+                        </h:dataTable>
+                    </div>
+
+                    <h:panelGroup layout="block"
+                                  styleClass="mensaje-info"
+                                  rendered="#{empty joyaAdminBean.joyas}">
+                        No hay joyas que coincidan con los filtros.
+                    </h:panelGroup>
+                </h:form>
+
+            </section>
+        </div>
+    </ui:define>
+</ui:composition>

@@ -58,7 +58,13 @@ public class PedidoBean implements Serializable {
                     )
             );
 
-            return "catalogo?faces-redirect=true";
+            // El mensaje debe sobrevivir al redirect hacia "Mis pedidos".
+            FacesContext.getCurrentInstance()
+                    .getExternalContext()
+                    .getFlash()
+                    .setKeepMessages(true);
+
+            return "pedidos?faces-redirect=true";
 
         }  catch (Exception e) {
         String mensaje = e.getMessage();

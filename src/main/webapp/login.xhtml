@@ -1,34 +1,56 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="jakarta.faces.html">
-<h:head>
-    <title>Iniciar sesión</title>
-</h:head>
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="jakarta.faces.html"
+        xmlns:ui="jakarta.faces.facelets"
+        xmlns:pt="jakarta.faces.passthrough"
+        template="/WEB-INF/templates/plantilla.xhtml">
 
-<h:body>
-    <h1>Iniciar sesión</h1>
+    <ui:define name="titulo">Iniciar sesión</ui:define>
 
-    <h:form>
-        <h:messages showDetail="true" />
+    <ui:define name="contenido">
+        <div class="contenedor">
+            <section class="formulario-seccion">
 
-        <h:panelGrid columns="2">
-            <h:outputLabel for="correo" value="Correo:" />
-            <h:inputText id="correo"
-                         value="#{authBean.correo}"
-                         required="true"
-                         requiredMessage="Ingrese su correo." />
+                <h2>Iniciar sesión</h2>
+                <p>Ingresa tus datos para acceder a tu cuenta.</p>
 
-            <h:outputLabel for="password" value="Contraseña:" />
-            <h:inputSecret id="password"
-                           value="#{authBean.password}"
-                           required="true"
-                           requiredMessage="Ingrese su contraseña." />
-        </h:panelGrid>
+                <h:form id="formLogin" styleClass="formulario">
 
-        <br />
+                    <div class="grupo-formulario">
+                        <h:outputLabel for="correo" value="Correo electrónico" />
+                        <h:inputText id="correo"
+                                     value="#{authBean.correo}"
+                                     required="true"
+                                     requiredMessage="Ingresa tu correo electrónico."
+                                     maxlength="100"
+                                     pt:type="email"
+                                     pt:placeholder="ejemplo@correo.com"
+                                     pt:autocomplete="email" />
+                    </div>
 
-        <h:commandButton value="Iniciar sesión"
-                         action="#{authBean.iniciarSesion}" />
-    </h:form>
-</h:body>
-</html>
+                    <div class="grupo-formulario">
+                        <h:outputLabel for="password" value="Contraseña" />
+                        <h:inputSecret id="password"
+                                       value="#{authBean.password}"
+                                       required="true"
+                                       requiredMessage="Ingresa tu contraseña."
+                                       maxlength="255"
+                                       pt:placeholder="Ingresa tu contraseña"
+                                       pt:autocomplete="current-password" />
+                    </div>
+
+                    <h:commandButton value="Iniciar sesión"
+                                     action="#{authBean.iniciarSesion}"
+                                     styleClass="boton-formulario" />
+
+                    <div class="enlace-alterno">
+                        ¿No tienes cuenta?
+                        <h:link outcome="registro" value="Regístrate" />
+                    </div>
+                </h:form>
+
+            </section>
+        </div>
+    </ui:define>
+</ui:composition>

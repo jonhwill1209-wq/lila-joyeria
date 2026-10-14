@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="jakarta.faces.html"
+        xmlns:f="jakarta.faces.core"
+        xmlns:ui="jakarta.faces.facelets"
+        xmlns:pt="jakarta.faces.passthrough"
+        template="/WEB-INF/templates/plantilla.xhtml">
+
+    <ui:define name="titulo">Registro</ui:define>
+
+    <ui:define name="contenido">
+        <div class="contenedor">
+            <section class="formulario-seccion">
+
+                <h2>Crear cuenta</h2>
+                <p>Completa tus datos para registrarte en Lila Joyería.</p>
+
+                <h:form id="formRegistro" styleClass="formulario">
+
+                    <div class="grupo-formulario">
+                        <h:outputLabel for="nombre" value="Nombre completo" />
+                        <h:inputText id="nombre"
+                                     value="#{registroBean.nombre}"
+                                     required="true"
+                                     requiredMessage="Ingresa tu nombre completo."
+                                     maxlength="100"
+                                     pt:placeholder="Ingresa tu nombre completo"
+                                     pt:autocomplete="name">
+                            <f:validateLength minimum="3" maximum="100" />
+                        </h:inputText>
+                    </div>
+
+                    <div class="grupo-formulario">
+                        <h:outputLabel for="correo" value="Correo electrónico" />
+                        <h:inputText id="correo"
+                                     value="#{registroBean.correo}"
+                                     required="true"
+                                     requiredMessage="Ingresa tu correo electrónico."
+                                     maxlength="100"
+                                     pt:type="email"
+                                     pt:placeholder="ejemplo@correo.com"
+                                     pt:autocomplete="email" />
+                    </div>
+
+                    <div class="grupo-formulario">
+                        <h:outputLabel for="password" value="Contraseña" />
+                        <h:inputSecret id="password"
+                                       value="#{registroBean.password}"
+                                       required="true"
+                                       requiredMessage="Ingresa una contraseña."
+                                       maxlength="255"
+                                       pt:placeholder="Mínimo 6 caracteres"
+                                       pt:autocomplete="new-password">
+                            <f:validateLength minimum="6" maximum="255" />
+                        </h:inputSecret>
+                    </div>
+
+                    <div class="grupo-formulario">
+                        <h:outputLabel for="confirmar" value="Confirmar contraseña" />
+                        <h:inputSecret id="confirmar"
+                                       value="#{registroBean.confirmarPassword}"
+                                       required="true"
+                                       requiredMessage="Confirma tu contraseña."
+                                       maxlength="255"
+                                       pt:placeholder="Confirma tu contraseña"
+                                       pt:autocomplete="new-password" />
+                    </div>
+
+                    <h:commandButton value="Registrarse"
+                                     action="#{registroBean.registrar}"
+                                     styleClass="boton-formulario" />
+
+                    <div class="enlace-alterno">
+                        ¿Ya tienes cuenta?
+                        <h:link outcome="login" value="Inicia sesión" />
+                    </div>
+                </h:form>
+
+            </section>
+        </div>
+    </ui:define>
+</ui:composition>
