@@ -10,12 +10,17 @@ import jakarta.inject.Inject;
 import jakarta.inject.Named;
 
 import java.io.Serializable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Named
 @ViewScoped
 public class PedidoBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
+
+    private static final Logger LOGGER =
+            Logger.getLogger(PedidoBean.class.getName());
 
     @Inject
     private AuthBean authBean;
@@ -28,6 +33,14 @@ public class PedidoBean implements Serializable {
     @PostConstruct
     public void iniciar() {
         pedidoDAO = new PedidoDAO();
+    }
+
+    private PedidoDAO obtenerPedidoDAO() {
+        if (pedidoDAO == null) {
+            pedidoDAO = new PedidoDAO();
+        }
+
+        return pedidoDAO;
     }
 
     public String confirmarPedido() {
@@ -45,40 +58,50 @@ public class PedidoBean implements Serializable {
 
         try {
             carrito.setUsuario(authBean.getUsuarioActual());
-            pedidoDAO.guardar(carrito);
+            carrito.calcularTotal();
 
-            carritoBean.vaciar();
+            obtenerPedidoDAO().guardar(carrito);
 
-            FacesContext.getCurrentInstance().addMessage(
-                    null,
-                    new FacesMessage(
-                            FacesMessage.SEVERITY_INFO,
-                            "Éxito",
-                            "Pedido realizado correctamente."
-                    )
-            );
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error al guardar el pedido.", e);
 
-            return "catalogo?faces-redirect=true";
+            String mensaje = e.getMessage();
 
-        }  catch (Exception e) {
-        String mensaje = e.getMessage();
+            if (mensaje == null
+                    || !mensaje.startsWith("No hay inventario suficiente")) {
+                mensaje = "No fue posible guardar el pedido.";
+            }
 
-        if (mensaje == null ||
-                !mensaje.startsWith(
-                        "No hay inventario suficiente"
-                )) {
-
-            mensaje = "No fue posible guardar el pedido.";
+            mostrarError(mensaje);
+            return null;
         }
 
-        mostrarError(mensaje);
-        return null;
-    }
+        carritoBean.vaciar();
 
+        FacesContext contexto = FacesContext.getCurrentInstance();
+
+        contexto.getExternalContext()
+                .getFlash()
+                .setKeepMessages(true);
+
+        contexto.addMessage(
+                null,
+                new FacesMessage(
+                        FacesMessage.SEVERITY_INFO,
+                        "Éxito",
+                        "Pedido realizado correctamente."
+                )
+        );
+
+        return "catalogo?faces-redirect=true";
     }
 
     private void mostrarError(String mensaje) {
-        FacesContext.getCurrentInstance().addMessage(
+        FacesContext contexto = FacesContext.getCurrentInstance();
+
+        contexto.validationFailed();
+
+        contexto.addMessage(
                 null,
                 new FacesMessage(
                         FacesMessage.SEVERITY_ERROR,
