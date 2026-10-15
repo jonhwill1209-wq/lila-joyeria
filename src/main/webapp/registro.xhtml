@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:p="jakarta.faces.passthrough"
+      lang="es">
+
+<h:head>
+    <meta charset="UTF-8" />
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0" />
+
+    <title>Registro - Lila Joyería</title>
+
+    <link rel="stylesheet"
+          href="#{request.contextPath}/css/estilos.css" />
+</h:head>
+
+<h:body>
+
+    <header class="encabezado">
+        <div class="contenedor">
+            <h1>Lila Joyería</h1>
+
+            <nav class="menu">
+                <h:link value="Inicio" outcome="/index.jsp" />
+                <h:link value="Catálogo" outcome="catalogo" />
+                <h:link value="Login" outcome="login" />
+                <h:link value="Registro" outcome="registro" />
+                <h:link value="Carrito" outcome="carrito" />
+            </nav>
+        </div>
+    </header>
+
+    <main class="contenedor">
+        <section class="formulario-seccion">
+
+            <h2>Crear cuenta</h2>
+
+            <p>
+                Completa tus datos para registrarte en Lila Joyería.
+            </p>
+
+            <h:form id="registroForm" styleClass="formulario">
+
+                <h:panelGroup id="mensajes" layout="block">
+                    <h:messages showSummary="false"
+                                showDetail="true"
+                                errorStyle="color: red;"
+                                infoStyle="color: green;" />
+                </h:panelGroup>
+
+                <div class="grupo-formulario">
+
+                    <h:outputLabel for="nombre"
+                                   value="Nombre completo" />
+
+                    <h:inputText id="nombre"
+                                 value="#{registroBean.nombre}"
+                                 required="true"
+                                 requiredMessage="Ingresa tu nombre completo."
+                                 validatorMessage="El nombre debe tener entre 3 y 100 caracteres."
+                                 maxlength="100"
+                                 p:placeholder="Ingresa tu nombre completo">
+
+                        <f:validateLength minimum="3" maximum="100" />
+
+                        <f:ajax event="blur"
+                                execute="@this"
+                                render=":registroForm:mensajes" />
+                    </h:inputText>
+
+                </div>
+
+                <div class="grupo-formulario">
+
+                    <h:outputLabel for="correo"
+                                   value="Correo electrónico" />
+
+                    <h:inputText id="correo"
+                                 value="#{registroBean.correo}"
+                                 required="true"
+                                 requiredMessage="Ingresa tu correo electrónico."
+                                 maxlength="100"
+                                 p:placeholder="ejemplo@correo.com">
+
+                        <f:validateLength maximum="100" />
+                        <f:validator validatorId="emailValidator" />
+
+                        <f:ajax event="blur"
+                                execute="@this"
+                                render=":registroForm:mensajes" />
+                    </h:inputText>
+
+                </div>
+
+                <div class="grupo-formulario">
+
+                    <h:outputLabel for="password"
+                                   value="Contraseña" />
+
+                    <h:inputSecret id="password"
+                                   value="#{registroBean.password}"
+                                   required="true"
+                                   requiredMessage="Ingresa una contraseña."
+                                   maxlength="255"
+                                   redisplay="false"
+                                   p:placeholder="Ingresa tu contraseña"
+                                   p:autocomplete="new-password">
+
+                        <f:validateLength maximum="255" />
+                        <f:validator validatorId="passwordValidator" />
+
+                        <f:ajax event="blur"
+                                execute="@this"
+                                render=":registroForm:mensajes" />
+                    </h:inputSecret>
+
+                    <p>
+                        Mínimo 8 caracteres, una mayúscula,
+                        una minúscula y un número.
+                    </p>
+
+                </div>
+
+                <div class="grupo-formulario">
+
+                    <h:outputLabel for="confirmarPassword"
+                                   value="Confirmar contraseña" />
+
+                    <h:inputSecret id="confirmarPassword"
+                                   value="#{registroBean.confirmarPassword}"
+                                   required="true"
+                                   requiredMessage="Confirma tu contraseña."
+                                   maxlength="255"
+                                   redisplay="false"
+                                   p:placeholder="Repite tu contraseña"
+                                   p:autocomplete="new-password">
+
+                        <f:validateLength maximum="255" />
+
+                    </h:inputSecret>
+
+                </div>
+
+                <h:commandButton value="Registrarse"
+                                 action="#{registroBean.registrar}"
+                                 styleClass="boton-formulario">
+
+                    <f:ajax execute="@form"
+                            render=":registroForm:mensajes" />
+                </h:commandButton>
+
+                <br />
+                <br />
+
+                <h:link value="Ya tengo cuenta. Iniciar sesión"
+                        outcome="login" />
+
+            </h:form>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2026 Lila Joyería</p>
+    </footer>
+
+</h:body>
+</html>
