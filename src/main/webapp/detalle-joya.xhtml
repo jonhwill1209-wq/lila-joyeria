@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      lang="es">
+
+<h:head>
+    <meta charset="UTF-8" />
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0" />
+
+    <title>Consultar joyas - Lila Joyería</title>
+
+    <link rel="stylesheet"
+          href="#{request.contextPath}/css/estilos.css" />
+
+    <style>
+        .consulta-seccion {
+            padding: 50px 0;
+        }
+
+        .consulta-seccion > h2 {
+            text-align: center;
+            font-size: 32px;
+            margin-bottom: 15px;
+        }
+
+        .consulta-descripcion {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #665264;
+        }
+
+        .consulta-filtros {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 25px;
+            background-color: white;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(74, 37, 69, 0.08);
+        }
+
+        .consulta-campo {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .consulta-campo label {
+            font-weight: 700;
+        }
+
+        .consulta-campo select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #D6C4D3;
+            border-radius: 4px;
+            background-color: #FCFAFB;
+            color: #4A2545;
+            font: inherit;
+        }
+
+        .consulta-campo select:focus {
+            outline: none;
+            border-color: #4A2545;
+            box-shadow: 0 0 5px rgba(74, 37, 69, 0.2);
+        }
+
+        .consulta-campo select:disabled {
+            opacity: 0.65;
+        }
+
+        .consulta-aviso {
+            color: #665264;
+            font-size: 14px;
+        }
+
+        .ficha-joya {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            gap: 35px;
+            align-items: center;
+            background-color: white;
+            padding: 35px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(74, 37, 69, 0.08);
+        }
+
+        .ficha-imagen {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 260px;
+            background-color: #FCFAFB;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .ficha-imagen img {
+            display: block;
+            width: 100%;
+            max-width: 320px;
+            height: 300px;
+            object-fit: contain;
+        }
+
+        .ficha-datos h3 {
+            font-size: 30px;
+            margin-bottom: 20px;
+        }
+
+        .ficha-datos p {
+            margin-bottom: 14px;
+            color: #665264;
+            line-height: 1.6;
+        }
+
+        .ficha-datos strong {
+            color: #4A2545;
+        }
+
+        .ficha-precio {
+            display: block;
+            font-size: 28px;
+            font-weight: 700;
+            color: #4A2545;
+            margin: 20px 0;
+        }
+
+        .ficha-agotado {
+            font-weight: 700;
+            color: #79343E;
+        }
+
+        .consulta-resumen {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            background-color: white;
+            padding: 25px;
+            border-radius: 8px;
+            margin-top: 30px;
+            box-shadow: 0 4px 15px rgba(74, 37, 69, 0.08);
+        }
+
+        .consulta-resumen p {
+            font-size: 20px;
+        }
+
+        .consulta-volver {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .consulta-volver a {
+            color: #4A2545;
+        }
+
+        .mensajes-consulta {
+            list-style: none;
+            padding: 0;
+        }
+
+        @media (max-width: 768px) {
+            .consulta-filtros,
+            .ficha-joya {
+                grid-template-columns: 1fr;
+            }
+
+            .ficha-joya {
+                padding: 25px;
+                gap: 25px;
+            }
+
+            .ficha-imagen img {
+                height: 240px;
+            }
+
+            .consulta-resumen {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .consulta-menu {
+                display: flex;
+                justify-content: center;
+                flex-wrap: wrap;
+                gap: 12px;
+            }
+
+            .consulta-menu a {
+                margin: 0;
+            }
+        }
+    </style>
+</h:head>
+
+<h:body>
+
+    <header class="encabezado">
+        <div class="contenedor">
+            <h1>Lila Joyería</h1>
+
+            <nav class="menu consulta-menu">
+                <a href="#{request.contextPath}/index.jsp">
+                    Inicio
+                </a>
+
+                <h:link value="Catálogo"
+                        outcome="/catalogo.xhtml" />
+
+                <h:link value="Consultar joyas"
+                        outcome="/detalle-joya.xhtml" />
+
+                <h:link value="Login"
+                        outcome="/login.xhtml"
+                        rendered="#{not authBean.autenticado}" />
+
+                <h:link value="Registro"
+                        outcome="/registro.xhtml"
+                        rendered="#{not authBean.autenticado}" />
+
+                <h:link value="Carrito"
+                        outcome="/carrito.xhtml" />
+            </nav>
+        </div>
+    </header>
+
+    <main class="contenedor">
+
+        <section class="consulta-seccion">
+
+            <h2>Encuentra tu joya</h2>
+
+            <p class="consulta-descripcion">
+                Selecciona una categoría y luego la joya
+                que deseas conocer.
+            </p>
+
+            <h:form id="detalleForm">
+
+                <h:panelGroup id="mensajes" layout="block">
+                    <h:messages showSummary="false"
+                                showDetail="true"
+                                styleClass="mensajes-consulta"
+                                errorClass="mensaje-error"
+                                infoClass="mensaje-exito" />
+                </h:panelGroup>
+
+                <div class="consulta-filtros">
+
+                    <div class="consulta-campo">
+
+                        <h:outputLabel for="categoria"
+                                       value="Tipo de joya" />
+
+                        <h:selectOneMenu
+                                id="categoria"
+                                value="#{detalleJoyaBean.idCategoriaSeleccionada}">
+
+                            <f:converter
+                                    converterId="jakarta.faces.Integer" />
+
+                            <f:selectItem
+                                    itemLabel="Selecciona una categoría..."
+                                    itemValue="#{null}"
+                                    noSelectionOption="true" />
+
+                            <f:selectItems
+                                    value="#{detalleJoyaBean.categorias}"
+                                    var="categoria"
+                                    itemLabel="#{categoria.nombre}"
+                                    itemValue="#{categoria.idCategoria}" />
+
+                            <f:ajax
+                                    execute="@this"
+                                    listener="#{detalleJoyaBean.cargarJoyasPorCategoria}"
+                                    render=":detalleForm:selectorJoya :detalleForm:detalle :detalleForm:mensajes"
+                                    resetValues="true" />
+                        </h:selectOneMenu>
+
+                    </div>
+
+                    <h:panelGroup id="selectorJoya"
+                                  layout="block"
+                                  styleClass="consulta-campo">
+
+                        <h:outputLabel for="joya"
+                                       value="Joya" />
+
+                        <h:selectOneMenu
+                                id="joya"
+                                value="#{detalleJoyaBean.joyaSeleccionada}"
+                                converter="joyaConverter"
+                                disabled="#{empty detalleJoyaBean.joyas}">
+
+                            <f:selectItem
+                                    itemLabel="Selecciona una joya..."
+                                    itemValue="#{null}"
+                                    noSelectionOption="true" />
+
+                            <f:selectItems
+                                    value="#{detalleJoyaBean.joyas}"
+                                    var="producto"
+                                    itemLabel="#{producto.nombre}"
+                                    itemValue="#{producto}" />
+
+                            <f:ajax
+                                    execute="@this"
+                                    render=":detalleForm:detalle :detalleForm:mensajes" />
+                        </h:selectOneMenu>
+
+                        <h:outputText
+                                value="Primero selecciona una categoría."
+                                styleClass="consulta-aviso"
+                                rendered="#{detalleJoyaBean.idCategoriaSeleccionada eq null}" />
+
+                        <h:outputText
+                                value="No hay joyas disponibles en esta categoría."
+                                styleClass="consulta-aviso"
+                                rendered="#{detalleJoyaBean.idCategoriaSeleccionada ne null and empty detalleJoyaBean.joyas}" />
+
+                    </h:panelGroup>
+
+                </div>
+
+                <h:panelGroup id="detalle" layout="block">
+
+                    <h:panelGroup
+                            layout="block"
+                            styleClass="mensaje-info"
+                            rendered="#{empty detalleJoyaBean.joyaSeleccionada}">
+
+                        Selecciona una joya para ver sus características,
+                        precio y disponibilidad.
+
+                    </h:panelGroup>
+
+                    <h:panelGroup
+                            layout="block"
+                            styleClass="ficha-joya"
+                            rendered="#{not empty detalleJoyaBean.joyaSeleccionada}">
+
+                        <div class="ficha-imagen">
+
+                            <h:graphicImage
+                                    value="/img/productos/#{detalleJoyaBean.joyaSeleccionada.imagen}"
+                                    alt="#{detalleJoyaBean.joyaSeleccionada.nombre}"
+                                    onerror="this.style.display='none';" />
+
+                        </div>
+
+                        <div class="ficha-datos">
+
+                            <h3>
+                                <h:outputText
+                                        value="#{detalleJoyaBean.joyaSeleccionada.nombre}" />
+                            </h3>
+
+                            <h:panelGroup
+                                    layout="block"
+                                    rendered="#{not empty detalleJoyaBean.joyaSeleccionada.descripcion}">
+
+                                <p>
+                                    <h:outputText
+                                            value="#{detalleJoyaBean.joyaSeleccionada.descripcion}" />
+                                </p>
+
+                            </h:panelGroup>
+
+                            <p>
+                                <strong>Categoría: </strong>
+
+                                <h:outputText
+                                        value="#{empty detalleJoyaBean.joyaSeleccionada.categoria ? 'Sin categoría' : detalleJoyaBean.joyaSeleccionada.categoria.nombre}" />
+                            </p>
+
+                            <p>
+                                <strong>Material: </strong>
+
+                                <h:outputText
+                                        value="#{detalleJoyaBean.joyaSeleccionada.material}" />
+                            </p>
+
+                            <h:panelGroup
+                                    layout="block"
+                                    rendered="#{detalleJoyaBean.joyaSeleccionada.quilates ne null}">
+
+                                <p>
+                                    <strong>Quilates: </strong>
+
+                                    <h:outputText
+                                            value="#{detalleJoyaBean.joyaSeleccionada.quilates}" />
+                                </p>
+
+                            </h:panelGroup>
+
+                            <p>
+                                <strong>Disponibles: </strong>
+
+                                <h:outputText
+                                        value="#{detalleJoyaBean.joyaSeleccionada.stock}" />
+
+                                unidades
+                            </p>
+
+                            <h:outputText
+                                    value="#{detalleJoyaBean.joyaSeleccionada.precio}"
+                                    styleClass="ficha-precio">
+
+                                <f:convertNumber
+                                        type="currency"
+                                        currencySymbol="$"
+                                        minFractionDigits="2"
+                                        maxFractionDigits="2" />
+                            </h:outputText>
+
+                            <h:commandButton
+                                    value="Agregar al carrito"
+                                    action="#{carritoBean.agregar(detalleJoyaBean.joyaSeleccionada)}"
+                                    styleClass="boton-carrito"
+                                    rendered="#{detalleJoyaBean.joyaSeleccionada.stock gt 0}">
+
+                                <f:ajax
+                                        execute="@this"
+                                        render=":detalleForm:mensajes :detalleForm:total" />
+                            </h:commandButton>
+
+                            <h:outputText
+                                    value="Producto agotado"
+                                    styleClass="ficha-agotado"
+                                    rendered="#{detalleJoyaBean.joyaSeleccionada.stock le 0}" />
+
+                        </div>
+
+                    </h:panelGroup>
+
+                </h:panelGroup>
+
+                <h:panelGroup id="total"
+                              layout="block"
+                              styleClass="consulta-resumen">
+
+                    <p>
+                        Total del carrito:
+
+                        <strong>
+                            <h:outputText value="#{carritoBean.total}">
+                                <f:convertNumber
+                                        type="currency"
+                                        currencySymbol="$"
+                                        minFractionDigits="2"
+                                        maxFractionDigits="2" />
+                            </h:outputText>
+                        </strong>
+                    </p>
+
+                    <h:link value="Ver carrito"
+                            outcome="/carrito.xhtml"
+                            styleClass="boton" />
+
+                </h:panelGroup>
+
+            </h:form>
+
+            <div class="consulta-volver">
+                <h:link value="Volver al catálogo"
+                        outcome="/catalogo.xhtml" />
+            </div>
+
+        </section>
+
+    </main>
+
+    <footer>
+        <p>&#169; 2026 Lila Joyería</p>
+    </footer>
+
+</h:body>
+</html>

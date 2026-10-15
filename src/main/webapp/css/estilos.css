@@ -490,3 +490,92 @@ footer {
         transform: none !important;
     }
 }
+
+/* Integración del catálogo con JSF */
+
+.mensajes-jsf {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.mensajes-jsf li {
+    list-style: none;
+}
+
+.barra-catalogo {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.filtro-catalogo {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.filtro-catalogo label {
+    font-weight: 700;
+}
+
+.filtro-catalogo select {
+    min-width: 220px;
+    max-width: 100%;
+    padding: 12px;
+    border: 1px solid #D6C4D3;
+    border-radius: 4px;
+    background: white;
+    color: #4A2545;
+    font: inherit;
+}
+
+.estado-carrito {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.acciones-catalogo {
+    margin-top: 30px;
+    text-align: center;
+}
+
+.sesion-cliente {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 25px;
+}
+
+@media (max-width: 768px) {
+    .barra-catalogo {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .filtro-catalogo select {
+        width: 100%;
+    }
+
+    .menu {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .menu a {
+        margin: 0;
+    }
+
+    .banner .contenedor {
+        padding: 30px 20px;
+    }
+}
