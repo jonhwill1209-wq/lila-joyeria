@@ -5,10 +5,14 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "categorias")
 public class Categoria implements java.io.Serializable {
+
     private static final long serialVersionUID = 1L;
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Column(name = "id_categoria")
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_categoria")
     private int idCategoria;
+
     @Column(nullable = false, length = 50)
     private String nombre;
 
@@ -34,6 +38,7 @@ public class Categoria implements java.io.Serializable {
                     "El identificador de la categoría no puede ser negativo"
             );
         }
+
         this.idCategoria = idCategoria;
     }
 
