@@ -14,82 +14,141 @@
 
                 <h2>Mi carrito</h2>
 
-                <h:panelGroup layout="block"
-                              styleClass="mensaje-info"
-                              rendered="#{empty carritoBean.carrito.detalles}">
-                    El carrito está vacío.
-                    <h:link outcome="catalogo" value="Ir al catálogo" />
-                </h:panelGroup>
+                <h:form id="carritoForm">
 
-                <h:form id="formCarrito"
-                        rendered="#{not empty carritoBean.carrito.detalles}">
+                    <h:panelGroup id="contenido" layout="block">
 
-                    <div class="tabla-contenedor">
-                        <h:dataTable value="#{carritoBean.carrito.detalles}"
-                                     var="detalle"
-                                     styleClass="tabla-carrito">
+                        <h:panelGroup layout="block"
+                                      styleClass="mensaje-info"
+                                      rendered="#{empty carritoBean.carrito.detalles}">
+                            El carrito está vacío.
+                            <h:link outcome="/catalogo"
+                                    value="Ir al catálogo" />
+                        </h:panelGroup>
 
-                            <h:column>
-                                <f:facet name="header">Producto</f:facet>
-                                <h:outputText value="#{detalle.joya.nombre}" />
-                            </h:column>
+                        <h:panelGroup layout="block"
+                                      styleClass="tabla-contenedor"
+                                      rendered="#{not empty carritoBean.carrito.detalles}">
 
-                            <h:column>
-                                <f:facet name="header">Precio</f:facet>
-                                <h:outputText value="#{detalle.precioUnitario}">
+                            <h:dataTable id="tabla"
+                                         value="#{carritoBean.carrito.detalles}"
+                                         var="detalle"
+                                         styleClass="tabla-carrito">
+
+                                <h:column>
+                                    <f:facet name="header">Producto</f:facet>
+                                    <h:outputText value="#{detalle.joya.nombre}" />
+                                </h:column>
+
+                                <h:column>
+                                    <f:facet name="header">Precio</f:facet>
+
+                                    <h:outputText value="#{detalle.precioUnitario}">
+                                        <f:convertNumber type="currency"
+                                                         currencySymbol="$"
+                                                         locale="en_US"
+                                                         minFractionDigits="2"
+                                                         maxFractionDigits="2" />
+                                    </h:outputText>
+                                </h:column>
+
+                                <h:column>
+                                    <f:facet name="header">Cantidad</f:facet>
+
+                                    <h:inputText id="cantidad"
+                                                 value="#{carritoBean.cantidades[detalle.joya.idJoya]}"
+                                                 styleClass="cantidad"
+                                                 size="4"
+                                                 required="true"
+                                                 requiredMessage="Ingresa una cantidad."
+                                                 converterMessage="La cantidad debe ser un número entero.">
+
+                                        <f:converter converterId="jakarta.faces.Integer" />
+
+                                        <f:attribute name="stockDisponible"
+                                                     value="#{detalle.joya.stock}" />
+
+                                        <f:validator validatorId="cantidadValidator" />
+
+                                        <f:ajax event="change"
+                                                execute="@this"
+                                                listener="#{carritoBean.actualizarCantidad(detalle)}"
+                                                render=":carritoForm:contenido :carritoForm:resumen :mensajes" />
+                                    </h:inputText>
+                                </h:column>
+
+                                <h:column>
+                                    <f:facet name="header">Subtotal</f:facet>
+
+                                    <h:outputText value="#{detalle.calcularSubtotal()}">
+                                        <f:convertNumber type="currency"
+                                                         currencySymbol="$"
+                                                         locale="en_US"
+                                                         minFractionDigits="2"
+                                                         maxFractionDigits="2" />
+                                    </h:outputText>
+                                </h:column>
+
+                                <h:column>
+                                    <f:facet name="header">Acción</f:facet>
+
+                                    <h:commandButton value="Eliminar"
+                                                     action="#{carritoBean.eliminar(detalle)}"
+                                                     styleClass="boton-tabla boton-peligro">
+
+                                        <f:ajax execute="@this"
+                                                render=":carritoForm:contenido :carritoForm:resumen :mensajes"
+                                                resetValues="true" />
+                                    </h:commandButton>
+                                </h:column>
+
+                            </h:dataTable>
+                        </h:panelGroup>
+                    </h:panelGroup>
+
+                    <h:panelGroup id="resumen" layout="block">
+
+                        <h:panelGroup layout="block"
+                                      styleClass="resumen-carrito"
+                                      rendered="#{not empty carritoBean.carrito.detalles}">
+
+                            <h3>
+                                Total:
+                                <h:outputText value="#{carritoBean.total}">
                                     <f:convertNumber type="currency"
                                                      currencySymbol="$"
-                                                     locale="en_US" />
+                                                     locale="en_US"
+                                                     minFractionDigits="2"
+                                                     maxFractionDigits="2" />
                                 </h:outputText>
-                            </h:column>
+                            </h3>
 
-                            <h:column>
-                                <f:facet name="header">Cantidad</f:facet>
-                                <h:outputText value="#{detalle.cantidad}" />
-                            </h:column>
+                            <h:commandButton value="Vaciar carrito"
+                                             action="#{carritoBean.vaciarConMensaje}"
+                                             styleClass="boton-formulario boton-secundario">
 
-                            <h:column>
-                                <f:facet name="header">Subtotal</f:facet>
-                                <h:outputText value="#{detalle.calcularSubtotal()}">
-                                    <f:convertNumber type="currency"
-                                                     currencySymbol="$"
-                                                     locale="en_US" />
-                                </h:outputText>
-                            </h:column>
+                                <f:ajax execute="@this"
+                                        render=":carritoForm:contenido :carritoForm:resumen :mensajes"
+                                        resetValues="true" />
+                            </h:commandButton>
 
-                            <h:column>
-                                <f:facet name="header">Acción</f:facet>
-                                <h:commandButton value="Eliminar"
-                                                 action="#{carritoBean.eliminar(detalle)}"
-                                                 styleClass="boton-tabla boton-peligro" />
-                            </h:column>
-                        </h:dataTable>
-                    </div>
+                            <h:commandButton value="Realizar pedido"
+                                             action="#{pedidoBean.confirmarPedido}"
+                                             styleClass="boton-formulario"
+                                             rendered="#{authBean.autenticado}">
 
-                    <div class="resumen-carrito">
-                        <h3>
-                            Total:
-                            <h:outputText value="#{carritoBean.total}">
-                                <f:convertNumber type="currency"
-                                                 currencySymbol="$"
-                                                 locale="en_US" />
-                            </h:outputText>
-                        </h3>
+                                <f:ajax execute="@form"
+                                        render=":carritoForm:contenido :carritoForm:resumen :mensajes" />
+                            </h:commandButton>
 
-                        <h:commandButton value="Vaciar carrito"
-                                         action="#{carritoBean.vaciar}"
-                                         styleClass="boton-formulario boton-secundario" />
+                            <h:link outcome="/login"
+                                    value="Inicia sesión para realizar el pedido"
+                                    styleClass="boton"
+                                    rendered="#{not authBean.autenticado}" />
 
-                        <h:commandButton value="Realizar pedido"
-                                         action="#{pedidoBean.confirmarPedido}"
-                                         styleClass="boton-formulario"
-                                         rendered="#{authBean.autenticado}" />
+                        </h:panelGroup>
+                    </h:panelGroup>
 
-                        <h:link outcome="login"
-                                value="Inicia sesión para realizar el pedido"
-                                styleClass="boton"
-                                rendered="#{not authBean.autenticado}" />
-                    </div>
                 </h:form>
 
             </section>

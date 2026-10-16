@@ -3,22 +3,24 @@ package com.lilajoyeria.bean;
 import com.lilajoyeria.dao.UsuarioDAO;
 import com.lilajoyeria.model.RolUsuario;
 import com.lilajoyeria.model.Usuario;
-import com.lilajoyeria.util.FacesUtil;
+import jakarta.faces.application.FacesMessage;
+import jakarta.faces.context.FacesContext;
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Named;
 
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-/**
- * Registro de nuevos clientes. El rol nunca viene del formulario: toda
- * cuenta creada desde aquí es CLIENTE.
- */
 @Named
 @ViewScoped
 public class RegistroBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
+
+    private static final Logger LOGGER =
+            Logger.getLogger(RegistroBean.class.getName());
 
     private String nombre;
     private String correo;
@@ -26,36 +28,101 @@ public class RegistroBean implements Serializable {
     private String confirmarPassword;
 
     public String registrar() {
+        FacesContext contexto = FacesContext.getCurrentInstance();
+
         if (password == null || !password.equals(confirmarPassword)) {
-            FacesUtil.error("Las contraseñas no coinciden.");
+            mostrarError("Las contraseñas no coinciden.");
+            return null;
+        }
+
+        if (nombre == null || nombre.trim().isEmpty()
+                || correo == null || correo.trim().isEmpty()
+                || password.isEmpty()) {
+            mostrarError("Completa todos los campos obligatorios.");
             return null;
         }
 
         try {
             UsuarioDAO usuarioDAO = new UsuarioDAO();
 
-            if (usuarioDAO.buscarPorEmail(correo) != null) {
-                FacesUtil.error("Ya existe una cuenta con ese correo.");
+            if (usuarioDAO.buscarPorEmail(correo.trim()) != null) {
+                mostrarError("Ya existe una cuenta con ese correo.");
                 return null;
             }
 
-            Usuario nuevo = new Usuario(
-                    nombre, correo, password, RolUsuario.CLIENTE
-            );
-            usuarioDAO.insertar(nuevo);
+            Usuario usuario = new Usuario();
+            usuario.setNombre(nombre.trim());
+            usuario.setEmail(correo.trim());
+            usuario.setPassword(password);
 
-            FacesUtil.info("Registro completado. Ya puedes iniciar sesión.");
-            FacesUtil.mantenerMensajes();
-            return "login?faces-redirect=true";
+            // El rol se establece en el servidor.
+            usuario.setRol(RolUsuario.CLIENTE);
+
+            int idGenerado = usuarioDAO.insertar(usuario);
+
+            if (idGenerado <= 0) {
+                mostrarError("No fue posible crear la cuenta.");
+                return null;
+            }
 
         } catch (IllegalArgumentException e) {
-            // Mensajes de validación del modelo (nombre, correo, contraseña).
-            FacesUtil.error(e.getMessage());
+            mostrarError(e.getMessage());
+            return null;
+
         } catch (SQLException e) {
-            FacesUtil.error("No fue posible completar el registro.");
+            LOGGER.log(Level.SEVERE, "Error al registrar usuario.", e);
+            mostrarError(
+                    "No fue posible completar el registro. "
+                            + "Inténtalo nuevamente."
+            );
+            return null;
+
+        } catch (Exception e) {
+            LOGGER.log(
+                    Level.SEVERE,
+                    "Error inesperado al registrar usuario.",
+                    e
+            );
+
+            mostrarError(
+                    "No fue posible crear la cuenta. "
+                            + "Inténtalo nuevamente."
+            );
+            return null;
         }
 
-        return null;
+        password = null;
+        confirmarPassword = null;
+
+        contexto.getExternalContext()
+                .getFlash()
+                .setKeepMessages(true);
+
+        contexto.addMessage(
+                null,
+                new FacesMessage(
+                        FacesMessage.SEVERITY_INFO,
+                        "Registro completado",
+                        "Cuenta creada correctamente. Ya puedes iniciar sesión."
+                )
+        );
+
+        return "/login.xhtml?faces-redirect=true";
+    }
+
+    private void mostrarError(String mensaje) {
+        FacesContext contexto = FacesContext.getCurrentInstance();
+
+        contexto.validationFailed();
+
+        contexto.addMessage(
+                null,
+                new FacesMessage(
+                        FacesMessage.SEVERITY_ERROR,
+                        "Error",
+                        mensaje
+                )
+        );
     }
 
     public String getNombre() {

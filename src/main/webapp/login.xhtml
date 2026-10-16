@@ -2,6 +2,7 @@
 <ui:composition
         xmlns="http://www.w3.org/1999/xhtml"
         xmlns:h="jakarta.faces.html"
+        xmlns:f="jakarta.faces.core"
         xmlns:ui="jakarta.faces.facelets"
         xmlns:pt="jakarta.faces.passthrough"
         template="/WEB-INF/templates/plantilla.xhtml">
@@ -18,7 +19,9 @@
                 <h:form id="formLogin" styleClass="formulario">
 
                     <div class="grupo-formulario">
-                        <h:outputLabel for="correo" value="Correo electrónico" />
+                        <h:outputLabel for="correo"
+                                       value="Correo electrónico" />
+
                         <h:inputText id="correo"
                                      value="#{authBean.correo}"
                                      required="true"
@@ -26,28 +29,40 @@
                                      maxlength="100"
                                      pt:type="email"
                                      pt:placeholder="ejemplo@correo.com"
-                                     pt:autocomplete="email" />
+                                     pt:autocomplete="email">
+
+                            <f:validator validatorId="emailValidator" />
+                        </h:inputText>
                     </div>
 
                     <div class="grupo-formulario">
-                        <h:outputLabel for="password" value="Contraseña" />
+                        <h:outputLabel for="password"
+                                       value="Contraseña" />
+
                         <h:inputSecret id="password"
                                        value="#{authBean.password}"
                                        required="true"
                                        requiredMessage="Ingresa tu contraseña."
                                        maxlength="255"
+                                       redisplay="false"
                                        pt:placeholder="Ingresa tu contraseña"
                                        pt:autocomplete="current-password" />
                     </div>
 
                     <h:commandButton value="Iniciar sesión"
                                      action="#{authBean.iniciarSesion}"
-                                     styleClass="boton-formulario" />
+                                     styleClass="boton-formulario">
+
+                        <f:ajax execute="@form"
+                                render="@form :mensajes" />
+                    </h:commandButton>
 
                     <div class="enlace-alterno">
                         ¿No tienes cuenta?
-                        <h:link outcome="registro" value="Regístrate" />
+                        <h:link outcome="/registro"
+                                value="Regístrate" />
                     </div>
+
                 </h:form>
 
             </section>

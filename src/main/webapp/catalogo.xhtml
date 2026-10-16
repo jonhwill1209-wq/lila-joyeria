@@ -14,65 +14,108 @@
             <section class="catalogo-seccion">
 
                 <h2>Catálogo de Joyas</h2>
+
                 <p class="catalogo-descripcion">
-                    Explora algunos de nuestros productos disponibles.
+                    Explora nuestra colección y encuentra tu joya favorita.
                 </p>
 
-                <!-- Filtros -->
                 <h:form id="formFiltros" styleClass="barra-filtros">
 
                     <div class="grupo-formulario">
                         <h:outputLabel for="texto" value="Buscar" />
+
                         <h:inputText id="texto"
                                      value="#{catalogoBean.texto}"
-                                     pt:placeholder="Nombre, material o descripción" />
+                                     pt:placeholder="Nombre, material o descripción">
+
+                            <f:ajax event="keyup"
+                                    delay="400"
+                                    execute="@form"
+                                    listener="#{catalogoBean.filtrar}"
+                                    render=":formProductos:productos :mensajes" />
+                        </h:inputText>
                     </div>
 
                     <div class="grupo-formulario">
-                        <h:outputLabel for="categoria" value="Categoría" />
+                        <h:outputLabel for="categoria"
+                                       value="Categoría" />
+
                         <h:selectOneMenu id="categoria"
-                                         value="#{catalogoBean.idCategoria}">
+                                         value="#{catalogoBean.categoriaSeleccionada}"
+                                         converter="categoriaConverter">
+
                             <f:selectItem itemLabel="Todas las categorías"
                                           itemValue="#{null}"
                                           noSelectionOption="true" />
+
                             <f:selectItems value="#{catalogoBean.categorias}"
-                                           var="c"
-                                           itemValue="#{c.idCategoria}"
-                                           itemLabel="#{c.nombre}" />
+                                           var="categoria"
+                                           itemValue="#{categoria}"
+                                           itemLabel="#{categoria.nombre}" />
+
+                            <f:ajax execute="@form"
+                                    listener="#{catalogoBean.filtrarPorCategoria}"
+                                    render=":formProductos:productos :mensajes" />
                         </h:selectOneMenu>
                     </div>
 
                     <div class="check-filtro">
                         <h:selectBooleanCheckbox id="disponibles"
-                                                 value="#{catalogoBean.soloDisponibles}" />
-                        <h:outputLabel for="disponibles" value="Solo disponibles" />
+                                                 value="#{catalogoBean.soloDisponibles}">
+
+                            <f:ajax execute="@form"
+                                    listener="#{catalogoBean.filtrar}"
+                                    render=":formProductos:productos :mensajes" />
+                        </h:selectBooleanCheckbox>
+
+                        <h:outputLabel for="disponibles"
+                                       value="Solo disponibles" />
                     </div>
 
                     <div class="acciones-filtro">
                         <h:commandButton value="Filtrar"
                                          action="#{catalogoBean.filtrar}"
-                                         styleClass="boton-formulario" />
+                                         styleClass="boton-formulario">
+
+                            <f:ajax execute="@form"
+                                    render=":formProductos:productos :mensajes" />
+                        </h:commandButton>
+
                         <h:commandButton value="Limpiar"
                                          action="#{catalogoBean.limpiar}"
-                                         styleClass="boton-formulario boton-secundario" />
+                                         styleClass="boton-formulario boton-secundario">
+
+                            <f:ajax execute="@this"
+                                    render="@form :formProductos:productos :mensajes"
+                                    resetValues="true" />
+                        </h:commandButton>
                     </div>
+
                 </h:form>
 
-                <!-- Productos -->
                 <h:form id="formProductos">
-                    <div class="lista-productos">
 
-                        <ui:repeat value="#{catalogoBean.joyas}" var="joya">
+                    <h:panelGroup id="productos"
+                                  layout="block"
+                                  styleClass="lista-productos">
+
+                        <ui:repeat value="#{catalogoBean.joyas}"
+                                   var="joya">
+
                             <article class="producto">
 
                                 <h:graphicImage value="/img/productos/#{joya.imagen}"
                                                 alt="#{joya.nombre}"
                                                 styleClass="producto-imagen" />
 
-                                <h3><h:outputText value="#{joya.nombre}" /></h3>
+                                <h3>
+                                    <h:outputText value="#{joya.nombre}" />
+                                </h3>
 
                                 <h:panelGroup rendered="#{not empty joya.descripcion}">
-                                    <p><h:outputText value="#{joya.descripcion}" /></p>
+                                    <p>
+                                        <h:outputText value="#{joya.descripcion}" />
+                                    </p>
                                 </h:panelGroup>
 
                                 <p>
@@ -94,29 +137,39 @@
 
                                 <p>
                                     <strong>Precio:</strong>
+
                                     <h:outputText value="#{joya.precio}">
                                         <f:convertNumber type="currency"
                                                          currencySymbol="$"
-                                                         locale="en_US" />
+                                                         locale="en_US"
+                                                         minFractionDigits="2"
+                                                         maxFractionDigits="2" />
                                     </h:outputText>
                                 </p>
 
                                 <p>
                                     <strong>Stock:</strong>
-                                    <h:outputText value="#{joya.stock}" /> unidades
+                                    <h:outputText value="#{joya.stock}" />
+                                    unidades
                                 </p>
 
-                                <!-- El administrador consulta el catálogo pero no compra -->
                                 <h:commandButton value="Agregar al carrito"
                                                  action="#{carritoBean.agregar(joya)}"
                                                  styleClass="boton-carrito"
-                                                 rendered="#{joya.stock gt 0 and not authBean.admin}" />
+                                                 rendered="#{joya.stock gt 0 and not authBean.admin}">
+
+                                    <f:ajax execute="@this"
+                                            render=":mensajes :formProductos:resumenCarrito" />
+                                </h:commandButton>
 
                                 <h:panelGroup rendered="#{joya.stock le 0}">
-                                    <p><strong>Producto agotado</strong></p>
+                                    <p>
+                                        <strong>Producto agotado</strong>
+                                    </p>
                                 </h:panelGroup>
 
                             </article>
+
                         </ui:repeat>
 
                         <h:panelGroup layout="block"
@@ -125,7 +178,34 @@
                             No hay joyas que coincidan con tu búsqueda.
                         </h:panelGroup>
 
-                    </div>
+                    </h:panelGroup>
+
+                    <h:panelGroup id="resumenCarrito" layout="block">
+
+                        <h:panelGroup layout="block"
+                                      styleClass="resumen-carrito"
+                                      rendered="#{not authBean.admin}">
+
+                            <h3>
+                                Total del carrito:
+
+                                <h:outputText value="#{carritoBean.total}">
+                                    <f:convertNumber type="currency"
+                                                     currencySymbol="$"
+                                                     locale="en_US"
+                                                     minFractionDigits="2"
+                                                     maxFractionDigits="2" />
+                                </h:outputText>
+                            </h3>
+
+                            <h:link outcome="/carrito"
+                                    value="Ver carrito"
+                                    styleClass="boton" />
+
+                        </h:panelGroup>
+
+                    </h:panelGroup>
+
                 </h:form>
 
             </section>
