@@ -1,109 +1,71 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="jakarta.faces.html"
-      xmlns:f="jakarta.faces.core"
-      xmlns:p="jakarta.faces.passthrough"
-      lang="es">
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="jakarta.faces.html"
+        xmlns:f="jakarta.faces.core"
+        xmlns:ui="jakarta.faces.facelets"
+        xmlns:pt="jakarta.faces.passthrough"
+        template="/WEB-INF/templates/plantilla.xhtml">
 
-<h:head>
-    <meta charset="UTF-8" />
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0" />
+    <ui:define name="titulo">Iniciar sesión</ui:define>
 
-    <title>Iniciar sesión - Lila Joyería</title>
-
-    <link rel="stylesheet"
-          href="#{request.contextPath}/css/estilos.css" />
-</h:head>
-
-<h:body>
-
-    <header class="encabezado">
+    <ui:define name="contenido">
         <div class="contenedor">
-            <h1>Lila Joyería</h1>
+            <section class="formulario-seccion">
 
-            <nav class="menu">
-                <a href="#{request.contextPath}/index.jsp">Inicio</a>
-                <h:link value="Catálogo" outcome="catalogo" />
-                <h:link value="Login" outcome="login" />
-                <h:link value="Registro" outcome="registro" />
-                <h:link value="Carrito" outcome="carrito" />
-            </nav>
+                <h2>Iniciar sesión</h2>
+                <p>Ingresa tus datos para acceder a tu cuenta.</p>
+
+                <h:form id="formLogin" styleClass="formulario">
+
+                    <div class="grupo-formulario">
+                        <h:outputLabel for="correo"
+                                       value="Correo electrónico" />
+
+                        <h:inputText id="correo"
+                                     value="#{authBean.correo}"
+                                     required="true"
+                                     requiredMessage="Ingresa tu correo electrónico."
+                                     maxlength="100"
+                                     pt:type="email"
+                                     pt:placeholder="ejemplo@correo.com"
+                                     pt:autocomplete="email">
+
+                            <f:validator validatorId="emailValidator" />
+                        </h:inputText>
+                    </div>
+
+                    <div class="grupo-formulario">
+                        <h:outputLabel for="password"
+                                       value="Contraseña" />
+
+                        <h:inputSecret id="password"
+                                       value="#{authBean.password}"
+                                       required="true"
+                                       requiredMessage="Ingresa tu contraseña."
+                                       maxlength="255"
+                                       redisplay="false"
+                                       pt:placeholder="Ingresa tu contraseña"
+                                       pt:autocomplete="current-password" />
+                    </div>
+
+                    <h:commandButton value="Iniciar sesión"
+                                     action="#{authBean.iniciarSesion}"
+                                     styleClass="boton-formulario">
+
+                        <f:ajax execute="@form"
+                                render="@form :mensajes" />
+                    </h:commandButton>
+
+                    <div class="enlace-alterno">
+                        ¿No tienes cuenta?
+                        <h:link outcome="/registro"
+                                value="Regístrate" />
+                    </div>
+
+                </h:form>
+
+            </section>
         </div>
-    </header>
-
-    <main class="contenedor">
-        <section class="formulario-seccion">
-
-            <h2>Iniciar sesión</h2>
-
-            <p>Ingresa tus datos para acceder a tu cuenta.</p>
-
-            <h:form id="loginForm" styleClass="formulario">
-
-                <h:panelGroup id="mensajes" layout="block">
-                    <h:messages showSummary="false"
-                                showDetail="true"
-                                styleClass="mensajes-jsf"
-                                errorClass="mensaje-error"
-                                infoClass="mensaje-exito" />
-                </h:panelGroup>
-
-                <div class="grupo-formulario">
-                    <h:outputLabel for="correo"
-                                   value="Correo electrónico" />
-
-                    <h:inputText id="correo"
-                                 value="#{authBean.correo}"
-                                 required="true"
-                                 requiredMessage="Ingresa tu correo electrónico."
-                                 maxlength="100"
-                                 p:placeholder="ejemplo@correo.com"
-                                 p:autocomplete="username">
-
-                        <f:validateLength maximum="100" />
-                        <f:validator validatorId="emailValidator" />
-
-                        <f:ajax event="blur"
-                                execute="@this"
-                                render=":loginForm:mensajes" />
-                    </h:inputText>
-                </div>
-
-                <div class="grupo-formulario">
-                    <h:outputLabel for="password"
-                                   value="Contraseña" />
-
-                    <h:inputSecret id="password"
-                                   value="#{authBean.password}"
-                                   required="true"
-                                   requiredMessage="Ingresa tu contraseña."
-                                   maxlength="255"
-                                   redisplay="false"
-                                   p:placeholder="Ingresa tu contraseña"
-                                   p:autocomplete="current-password" />
-                </div>
-
-                <h:commandButton value="Iniciar sesión"
-                                 action="#{authBean.iniciarSesion}"
-                                 styleClass="boton-formulario">
-
-                    <f:ajax execute="@form"
-                            render=":loginForm:mensajes" />
-                </h:commandButton>
-
-                <h:link value="¿No tienes cuenta? Regístrate"
-                        outcome="registro"
-                        styleClass="enlace-formulario" />
-
-            </h:form>
-
-        </section>
-    </main>
-
-    <footer>
-        <p>© 2026 Lila Joyería</p>
-    </footer>
-
-</h:body>
-</html>
+    </ui:define>
+</ui:composition>

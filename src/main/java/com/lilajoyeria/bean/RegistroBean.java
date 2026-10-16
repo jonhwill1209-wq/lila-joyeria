@@ -9,6 +9,7 @@ import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Named;
 
 import java.io.Serializable;
+import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -30,24 +31,22 @@ public class RegistroBean implements Serializable {
         FacesContext contexto = FacesContext.getCurrentInstance();
 
         if (password == null || !password.equals(confirmarPassword)) {
-            contexto.addMessage(
-                    "registroForm:confirmarPassword",
-                    new FacesMessage(
-                            FacesMessage.SEVERITY_ERROR,
-                            "Error",
-                            "Las contraseñas no coinciden."
-                    )
-            );
+            mostrarError("Las contraseñas no coinciden.");
+            return null;
+        }
 
-            contexto.validationFailed();
+        if (nombre == null || nombre.trim().isEmpty()
+                || correo == null || correo.trim().isEmpty()
+                || password.isEmpty()) {
+            mostrarError("Completa todos los campos obligatorios.");
             return null;
         }
 
         try {
             UsuarioDAO usuarioDAO = new UsuarioDAO();
 
-            if (usuarioDAO.buscarPorEmail(correo) != null) {
-                mostrarError("Este correo ya está registrado.");
+            if (usuarioDAO.buscarPorEmail(correo.trim()) != null) {
+                mostrarError("Ya existe una cuenta con ese correo.");
                 return null;
             }
 
@@ -55,6 +54,8 @@ public class RegistroBean implements Serializable {
             usuario.setNombre(nombre.trim());
             usuario.setEmail(correo.trim());
             usuario.setPassword(password);
+
+            // El rol se establece en el servidor.
             usuario.setRol(RolUsuario.CLIENTE);
 
             int idGenerado = usuarioDAO.insertar(usuario);
@@ -64,39 +65,57 @@ public class RegistroBean implements Serializable {
                 return null;
             }
 
-            password = null;
-            confirmarPassword = null;
+        } catch (IllegalArgumentException e) {
+            mostrarError(e.getMessage());
+            return null;
 
-            contexto.getExternalContext()
-                    .getFlash()
-                    .setKeepMessages(true);
-
-            contexto.addMessage(
-                    null,
-                    new FacesMessage(
-                            FacesMessage.SEVERITY_INFO,
-                            "Registro completado",
-                            "Cuenta creada correctamente. Ya puedes iniciar sesión."
-                    )
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al registrar usuario.", e);
+            mostrarError(
+                    "No fue posible completar el registro. "
+                            + "Inténtalo nuevamente."
             );
-
-            return "login?faces-redirect=true";
+            return null;
 
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Error al registrar usuario.", e);
+            LOGGER.log(
+                    Level.SEVERE,
+                    "Error inesperado al registrar usuario.",
+                    e
+            );
 
             mostrarError(
                     "No fue posible crear la cuenta. "
-                            + "El correo podría estar registrado; "
-                            + "si el problema continúa, revisa la consola."
+                            + "Inténtalo nuevamente."
             );
-
             return null;
         }
+
+        password = null;
+        confirmarPassword = null;
+
+        contexto.getExternalContext()
+                .getFlash()
+                .setKeepMessages(true);
+
+        contexto.addMessage(
+                null,
+                new FacesMessage(
+                        FacesMessage.SEVERITY_INFO,
+                        "Registro completado",
+                        "Cuenta creada correctamente. Ya puedes iniciar sesión."
+                )
+        );
+
+        return "/login.xhtml?faces-redirect=true";
     }
 
     private void mostrarError(String mensaje) {
-        FacesContext.getCurrentInstance().addMessage(
+        FacesContext contexto = FacesContext.getCurrentInstance();
+
+        contexto.validationFailed();
+
+        contexto.addMessage(
                 null,
                 new FacesMessage(
                         FacesMessage.SEVERITY_ERROR,

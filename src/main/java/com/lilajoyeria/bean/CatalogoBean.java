@@ -13,8 +13,10 @@ import jakarta.inject.Named;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 @Named
 @ViewScoped
@@ -28,10 +30,13 @@ public class CatalogoBean implements Serializable {
     private transient JoyaDAO joyaDAO;
     private transient CategoriaDAO categoriaDAO;
 
+    private List<Joya> todas = new ArrayList<>();
     private List<Joya> joyas = new ArrayList<>();
     private List<Categoria> categorias = new ArrayList<>();
 
-    private Categoria categoriaSeleccionada;
+    private String texto;
+    private Integer idCategoria;
+    private boolean soloDisponibles;
 
     @PostConstruct
     public void iniciar() {
@@ -65,28 +70,54 @@ public class CatalogoBean implements Serializable {
 
     public void cargarJoyas() {
         try {
-            if (categoriaSeleccionada == null) {
-                joyas = obtenerJoyaDAO().listar();
-            } else {
-                joyas = obtenerJoyaDAO().obtenerJoyasPorCategoria(
-                        categoriaSeleccionada.getIdCategoria()
-                );
-            }
+            todas = obtenerJoyaDAO().listar();
+            filtrar();
 
             LOGGER.log(
                     Level.INFO,
                     "Catálogo cargado: {0} productos.",
-                    joyas.size()
+                    todas.size()
             );
         } catch (Exception e) {
+            todas = new ArrayList<>();
             joyas = new ArrayList<>();
             LOGGER.log(Level.SEVERE, "Error al cargar el catálogo.", e);
             mostrarError("No fue posible cargar el catálogo.");
         }
     }
 
+    public void filtrar() {
+        String buscado = texto == null
+                ? ""
+                : texto.trim().toLowerCase(Locale.ROOT);
+
+        joyas = todas.stream()
+                .filter(j -> buscado.isEmpty()
+                        || contiene(j.getNombre(), buscado)
+                        || contiene(j.getDescripcion(), buscado)
+                        || contiene(j.getMaterial(), buscado))
+                .filter(j -> idCategoria == null
+                        || (j.getCategoria() != null
+                        && j.getCategoria().getIdCategoria()
+                        == idCategoria.intValue()))
+                .filter(j -> !soloDisponibles || j.getStock() > 0)
+                .collect(Collectors.toList());
+    }
+
     public void filtrarPorCategoria() {
-        cargarJoyas();
+        filtrar();
+    }
+
+    public void limpiar() {
+        texto = null;
+        idCategoria = null;
+        soloDisponibles = false;
+        filtrar();
+    }
+
+    private static boolean contiene(String valor, String buscado) {
+        return valor != null
+                && valor.toLowerCase(Locale.ROOT).contains(buscado);
     }
 
     public List<Joya> getJoyas() {
@@ -97,12 +128,52 @@ public class CatalogoBean implements Serializable {
         return categorias;
     }
 
+    public String getTexto() {
+        return texto;
+    }
+
+    public void setTexto(String texto) {
+        this.texto = texto;
+    }
+
+    public Integer getIdCategoria() {
+        return idCategoria;
+    }
+
+    public void setIdCategoria(Integer idCategoria) {
+        this.idCategoria = idCategoria;
+    }
+
+    public boolean isSoloDisponibles() {
+        return soloDisponibles;
+    }
+
+    public void setSoloDisponibles(boolean soloDisponibles) {
+        this.soloDisponibles = soloDisponibles;
+    }
+
+    /*
+     * Permite usar CategoriaConverter en los formularios.
+     * Ambos tipos de selección utilizan el mismo idCategoria.
+     */
     public Categoria getCategoriaSeleccionada() {
-        return categoriaSeleccionada;
+        if (idCategoria == null) {
+            return null;
+        }
+
+        for (Categoria categoria : categorias) {
+            if (categoria.getIdCategoria() == idCategoria.intValue()) {
+                return categoria;
+            }
+        }
+
+        return null;
     }
 
     public void setCategoriaSeleccionada(Categoria categoriaSeleccionada) {
-        this.categoriaSeleccionada = categoriaSeleccionada;
+        idCategoria = categoriaSeleccionada == null
+                ? null
+                : categoriaSeleccionada.getIdCategoria();
     }
 
     private void mostrarError(String mensaje) {

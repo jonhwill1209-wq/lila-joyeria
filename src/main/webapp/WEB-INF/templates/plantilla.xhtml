@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets">
+
+<h:head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><ui:insert name="titulo">Inicio</ui:insert> - Lila Joyería</title>
+    <link rel="stylesheet"
+          href="#{facesContext.externalContext.requestContextPath}/css/estilos.css?v=3" />
+</h:head>
+
+<h:body>
+
+    <header class="encabezado">
+        <div class="contenedor">
+            <h1>Lila Joyería</h1>
+
+            <!--
+                Navegación por rol (RolUsuario):
+                  visitante : Inicio, Catálogo, Carrito, Login, Registro
+                  CLIENTE   : Inicio, Catálogo, Carrito, Mis pedidos, Cerrar sesión
+                  ADMIN     : Inicio, Catálogo, Joyas, Usuarios, Pedidos, Cerrar sesión
+            -->
+            <nav class="menu">
+                <h:link outcome="/index" value="Inicio" />
+                <h:link outcome="/catalogo" value="Catálogo" />
+
+                <h:link outcome="/detalle-joya"
+                        value="Consultar joyas" />
+
+                <!-- Visitante y cliente (el administrador no compra) -->
+                <h:link outcome="/carrito" value="Carrito"
+                        rendered="#{not authBean.admin}" />
+
+                <!-- Solo visitante -->
+                <h:link outcome="/login" value="Login"
+                        rendered="#{not authBean.autenticado}" />
+                <h:link outcome="/registro" value="Registro"
+                        rendered="#{not authBean.autenticado}" />
+
+                <!-- Solo cliente -->
+                <h:link outcome="/pedidos" value="Mis pedidos"
+                        rendered="#{authBean.cliente}" />
+
+                <!-- Solo administrador -->
+                <h:link outcome="/admin/joyas" value="Joyas"
+                        rendered="#{authBean.admin}" />
+                <h:link outcome="/admin/usuarios" value="Usuarios"
+                        rendered="#{authBean.admin}" />
+                <h:link outcome="/pedidos" value="Pedidos"
+                        rendered="#{authBean.admin}" />
+
+                <!-- Usuario autenticado -->
+                <h:panelGroup rendered="#{authBean.autenticado}"
+                              styleClass="menu-usuario">
+                    <span class="usuario-etiqueta">
+                        <h:outputText value="#{authBean.usuarioActual.nombre}" />
+                        <span class="rol-badge">
+                            <h:outputText value="#{authBean.usuarioActual.rol}" />
+                        </span>
+                    </span>
+                    <h:form styleClass="form-menu">
+                        <h:commandLink value="Cerrar sesión"
+                                       action="#{authBean.cerrarSesion}" />
+                    </h:form>
+                </h:panelGroup>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="contenedor">
+            <h:messages id="mensajes"
+                        layout="list"
+                        showSummary="false"
+                        showDetail="true"
+                        styleClass="mensajes"
+                        infoClass="mensaje-exito"
+                        warnClass="mensaje-aviso"
+                        errorClass="mensaje-error"
+                        fatalClass="mensaje-error" />
+        </div>
+
+        <ui:insert name="contenido" />
+    </main>
+
+    <footer>
+        <p>&#169; 2026 Lila Joyería</p>
+    </footer>
+
+</h:body>
+</html>

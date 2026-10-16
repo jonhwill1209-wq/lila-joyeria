@@ -8,6 +8,19 @@
 
   <display-name>Lila Joyería</display-name>
 
+  <!-- Los campos de texto vacíos llegan como null a los beans
+       (necesario para BigDecimal/Integer opcionales y filtros "Todos"). -->
+  <context-param>
+    <param-name>jakarta.faces.INTERPRET_EMPTY_STRING_SUBMITTED_VALUES_AS_NULL</param-name>
+    <param-value>true</param-value>
+  </context-param>
+
+  <!-- No enviar al navegador los comentarios HTML de las plantillas. -->
+  <context-param>
+    <param-name>jakarta.faces.FACELETS_SKIP_COMMENTS</param-name>
+    <param-value>true</param-value>
+  </context-param>
+
   <servlet>
     <servlet-name>Faces Servlet</servlet-name>
     <servlet-class>jakarta.faces.webapp.FacesServlet</servlet-class>
@@ -18,5 +31,24 @@
     <servlet-name>Faces Servlet</servlet-name>
     <url-pattern>*.xhtml</url-pattern>
   </servlet-mapping>
+
+  <!-- El filtro de roles (AccesoFilter) se registra con @WebFilter. -->
+
+  <session-config>
+    <session-timeout>30</session-timeout>
+    <cookie-config>
+      <http-only>true</http-only>
+    </cookie-config>
+  </session-config>
+
+  <welcome-file-list>
+    <welcome-file>index.xhtml</welcome-file>
+  </welcome-file-list>
+
+  <!-- Sesión caducada durante un envío de formulario: volver al login. -->
+  <error-page>
+    <exception-type>jakarta.faces.application.ViewExpiredException</exception-type>
+    <location>/login.xhtml</location>
+  </error-page>
 
 </web-app>

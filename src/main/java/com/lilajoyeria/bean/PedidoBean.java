@@ -76,6 +76,7 @@ public class PedidoBean implements Serializable {
             return null;
         }
 
+        // Vaciar únicamente después de guardar correctamente.
         carritoBean.vaciar();
 
         FacesContext contexto = FacesContext.getCurrentInstance();
@@ -89,11 +90,12 @@ public class PedidoBean implements Serializable {
                 new FacesMessage(
                         FacesMessage.SEVERITY_INFO,
                         "Éxito",
-                        "Pedido realizado correctamente."
+                        "Pedido registrado correctamente. "
+                                + "Puedes consultarlo en Mis pedidos."
                 )
         );
 
-        return "catalogo?faces-redirect=true";
+        return "/pedidos.xhtml?faces-redirect=true";
     }
 
     private void mostrarError(String mensaje) {
