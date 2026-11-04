@@ -18,6 +18,12 @@
   </properties>
 
   <dependencies>
+    <!-- Jackson Databind para serializar respuestas de la API REST como JSON -->
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>2.15.2</version>
+    </dependency>
     <dependency>
       <groupId>org.hibernate.orm</groupId><artifactId>hibernate-core</artifactId><version>6.6.11.Final</version>
     </dependency>

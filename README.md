@@ -50,7 +50,7 @@ git clone [https://github.com/jonhwill1209-wq/lila-joyeria.git](https://github.c
 1. Ve a la ruta `src/main/resources/database.properties`.
 2. Edita el archivo con tus credenciales locales de MySQL:
 ```properties
-db.url=jdbc:mysql://localhost:3306/lila_joyeria?useSSL=false&serverTimezone=UTC
+db.url=jdbc:mysql://localhost:3306/lila_joyeria?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
 db.user=tu_usuario_local
 db.password=tu_contraseña_local
 db.driver=com.mysql.cj.jdbc.Driver

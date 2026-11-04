@@ -1,0 +1,50 @@
+{
+  "info": {
+    "name": "Lila Joyería API",
+    "description": "Colección base para probar los endpoints de Joyas, Usuarios y Pedidos.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080/lila-joyeria"
+    },
+    {
+      "key": "joyaId",
+      "value": "1"
+    }
+  ],
+  "item": [
+    {
+      "name": "Joyas",
+      "item": [
+        {
+          "name": "Listar joyas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/joyas"
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener joya por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/joyas/{{joyaId}}"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Usuarios",
+      "item": []
+    },
+    {
+      "name": "Pedidos",
+      "item": []
+    }
+  ]
+}
