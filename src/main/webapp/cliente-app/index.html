@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Catálogo | Lila Joyería</title>
+
+    <link rel="stylesheet" href="styles.css?v=4">
+    <script src="app.js" defer></script>
+</head>
+<body>
+<header class="cabecera">
+    <div class="contenedor cabecera-contenido">
+        <a class="marca" href="./index.html">
+            Lila Joyería
+        </a>
+
+        <nav aria-label="Navegación principal">
+            <a class="enlace" href="login.html">
+                Iniciar sesión
+            </a>
+
+            <span aria-hidden="true"> · </span>
+
+            <a class="enlace" href="../index.xhtml">
+                Ir al sitio principal
+            </a>
+        </nav>
+    </div>
+</header>
+
+<main class="contenedor">
+    <section class="presentacion" aria-labelledby="titulo">
+        <p class="subtitulo">Nuestra colección</p>
+
+        <h1 id="titulo">Encuentra tu próxima joya</h1>
+
+        <p>
+            Explora nuestros diseños y consulta su disponibilidad.
+        </p>
+    </section>
+
+    <section class="panel-filtros" aria-label="Filtros del catálogo">
+        <form id="formFiltros" class="filtros">
+            <div class="campo">
+                <label for="buscar">Buscar joyas</label>
+
+                <input
+                        id="buscar"
+                        name="buscar"
+                        type="search"
+                        maxlength="100"
+                        placeholder="Nombre, material o descripción"
+                >
+            </div>
+
+            <div class="campo">
+                <label for="categoria">Categoría</label>
+
+                <select id="categoria" name="categoria">
+                    <option value="">Todas las categorías</option>
+                </select>
+            </div>
+
+            <label class="campo-check" for="soloDisponibles">
+                <input
+                        id="soloDisponibles"
+                        name="soloDisponibles"
+                        type="checkbox"
+                >
+
+                Solo disponibles
+            </label>
+
+            <button type="reset" class="boton boton-secundario">
+                Limpiar
+            </button>
+
+            <button
+                    id="btnRecargar"
+                    type="button"
+                    class="boton"
+            >
+                Actualizar catálogo
+            </button>
+        </form>
+    </section>
+
+    <div
+            id="mensaje"
+            class="mensaje"
+            role="alert"
+            hidden
+    ></div>
+
+    <div
+            id="estadoCarga"
+            class="estado-carga"
+            role="status"
+            hidden
+    >
+        <span class="spinner" aria-hidden="true"></span>
+        <span>Cargando joyas…</span>
+    </div>
+
+    <section aria-labelledby="tituloProductos">
+        <div class="cabecera-productos">
+            <h2 id="tituloProductos">Catálogo de joyas</h2>
+
+            <p
+                    id="contador"
+                    role="status"
+                    aria-live="polite"
+            ></p>
+        </div>
+
+        <p id="sinResultados" class="sin-resultados" hidden>
+            No hay joyas que coincidan con los filtros seleccionados.
+        </p>
+
+        <div
+                id="productos"
+                class="productos"
+                aria-busy="false"
+        ></div>
+    </section>
+</main>
+
+<footer class="pie">
+    <p>Lila Joyería · Diseños para cada ocasión</p>
+</footer>
+</body>
+</html>
