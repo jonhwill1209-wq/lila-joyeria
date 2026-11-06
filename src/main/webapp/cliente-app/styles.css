@@ -340,3 +340,46 @@ select {
         animation: none;
     }
 }
+
+.acceso {
+    max-width: 480px;
+    margin: 48px auto;
+    padding-bottom: 40px;
+}
+
+.formulario-acceso {
+    display: grid;
+    gap: 20px;
+    margin-top: 24px;
+}
+
+.formulario-acceso input {
+    width: 100%;
+    min-height: 46px;
+    padding: 10px 12px;
+    color: var(--lila);
+    background: white;
+    border: 1px solid var(--borde);
+    border-radius: 6px;
+}
+
+.boton-detalle-rest {
+    display: block;
+    margin: 20px auto 0;
+    padding: 10px 20px;
+    border: 1px solid #4A2545;
+    border-radius: 4px;
+    background: #4A2545;
+    color: #FFFFFF;
+    font: inherit;
+    cursor: pointer;
+}
+
+.boton-detalle-rest:hover {
+    background: #331A38;
+}
+
+.boton-detalle-rest:focus-visible {
+    outline: 3px solid #94708E;
+    outline-offset: 3px;
+}
