@@ -8,6 +8,7 @@
 
     <link rel="stylesheet" href="styles.css?v=4">
     <script src="app.js" defer></script>
+    <script src="gestion.js" defer></script>
 </head>
 <body>
 <header class="cabecera">
@@ -69,7 +70,6 @@
                         name="soloDisponibles"
                         type="checkbox"
                 >
-
                 Solo disponibles
             </label>
 
@@ -77,29 +77,15 @@
                 Limpiar
             </button>
 
-            <button
-                    id="btnRecargar"
-                    type="button"
-                    class="boton"
-            >
+            <button id="btnRecargar" type="button" class="boton">
                 Actualizar catálogo
             </button>
         </form>
     </section>
 
-    <div
-            id="mensaje"
-            class="mensaje"
-            role="alert"
-            hidden
-    ></div>
+    <div id="mensaje" class="mensaje" role="alert" hidden></div>
 
-    <div
-            id="estadoCarga"
-            class="estado-carga"
-            role="status"
-            hidden
-    >
+    <div id="estadoCarga" class="estado-carga" role="status" hidden>
         <span class="spinner" aria-hidden="true"></span>
         <span>Cargando joyas…</span>
     </div>
@@ -124,6 +110,128 @@
                 class="productos"
                 aria-busy="false"
         ></div>
+    </section>
+
+    <section
+            class="panel-filtros gestion-preparacion"
+            aria-labelledby="tituloGestion"
+    >
+        <h2 id="tituloGestion">Preparación del formulario de joyas</h2>
+
+        <p class="gestion-nota">
+            Modo de prueba: permite consultar y validar datos.
+            Los cambios todavía no se guardan.
+        </p>
+
+        <div class="gestion-acciones">
+            <button id="btnNuevaJoya" type="button" class="boton">
+                Preparar nueva joya
+            </button>
+        </div>
+
+        <form id="formConsultarEdicion" class="gestion-consulta">
+            <div class="campo">
+                <label for="idConsultarJoya">
+                    Identificador de la joya que deseas editar
+                </label>
+
+                <input
+                        id="idConsultarJoya"
+                        type="number"
+                        min="1"
+                        max="2147483647"
+                        step="1"
+                        required
+                >
+            </div>
+
+            <button id="btnConsultarEdicion" type="submit" class="boton">
+                Cargar para editar
+            </button>
+        </form>
+
+        <p
+                id="mensajeGestion"
+                class="mensaje"
+                role="status"
+                aria-live="polite"
+                hidden
+        ></p>
+
+        <form id="formJoya" class="gestion-formulario" hidden>
+            <h3 id="tituloFormularioJoya">Nueva joya</h3>
+
+            <div class="campo">
+                <label for="nombreJoya">Nombre</label>
+                <input
+                        id="nombreJoya"
+                        type="text"
+                        maxlength="100"
+                        required
+                >
+            </div>
+
+            <div class="campo">
+                <label for="materialJoya">Material</label>
+                <input
+                        id="materialJoya"
+                        type="text"
+                        maxlength="50"
+                        required
+                >
+            </div>
+
+            <div class="gestion-columnas">
+                <div class="campo">
+                    <label for="precioJoya">Precio en dólares</label>
+                    <input
+                            id="precioJoya"
+                            type="number"
+                            min="0.01"
+                            max="99999999.99"
+                            step="0.01"
+                            required
+                    >
+                </div>
+
+                <div class="campo">
+                    <label for="stockJoya">Stock</label>
+                    <input
+                            id="stockJoya"
+                            type="number"
+                            min="0"
+                            max="2147483647"
+                            step="1"
+                            required
+                    >
+                </div>
+            </div>
+
+            <div class="campo">
+                <label for="categoriaJoya">Categoría</label>
+                <select id="categoriaJoya" required>
+                    <option value="">Selecciona una categoría</option>
+                </select>
+
+                <small>
+                    Se muestran las categorías presentes en el catálogo.
+                </small>
+            </div>
+
+            <div class="gestion-acciones">
+                <button type="submit" class="boton">
+                    Validar datos
+                </button>
+
+                <button
+                        id="btnCancelarJoya"
+                        type="button"
+                        class="boton boton-secundario"
+                >
+                    Cancelar
+                </button>
+            </div>
+        </form>
     </section>
 </main>
 
