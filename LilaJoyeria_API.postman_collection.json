@@ -16,6 +16,38 @@
   ],
   "item": [
     {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login ADMIN (abre sesión)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@lila.com\",\n  \"password\": \"CAMBIAR\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/auth/logout"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
       "name": "Joyas",
       "item": [
         {
@@ -31,6 +63,51 @@
           "name": "Obtener joya por ID",
           "request": {
             "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/joyas/{{joyaId}}"
+          },
+          "response": []
+        },
+        {
+          "name": "Crear joya (ADMIN)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/joyas",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Anillo Prueba\",\n  \"material\": \"Oro\",\n  \"descripcion\": \"Joya de prueba\",\n  \"quilates\": 18.0,\n  \"precio\": 150.0,\n  \"stock\": 5,\n  \"idCategoria\": 1\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar joya (ADMIN)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/joyas/{{joyaId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Anillo Prueba\",\n  \"material\": \"Oro\",\n  \"descripcion\": \"Joya de prueba\",\n  \"quilates\": 18.0,\n  \"precio\": 150.0,\n  \"stock\": 5,\n  \"idCategoria\": 1\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar joya (ADMIN)",
+          "request": {
+            "method": "DELETE",
             "header": [],
             "url": "{{baseUrl}}/api/joyas/{{joyaId}}"
           },
