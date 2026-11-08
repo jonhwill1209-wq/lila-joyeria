@@ -10,12 +10,14 @@ import com.lilajoyeria.model.RolUsuario;
 import com.lilajoyeria.model.Usuario;
 import com.lilajoyeria.util.ValidatorUtil;
 import com.lilajoyeria.utilidades.ApiResponse;
+import com.lilajoyeria.utilidades.ApiResponseWriter;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.logging.Logger;
 
 /**
  * Servlet encargado de gestionar la autenticación de usuarios en la API REST.
@@ -31,6 +33,7 @@ public class AuthServlet extends HttpServlet {
     public static final String ATRIBUTO_USUARIO_API = "usuarioApi";
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final Logger LOGGER = Logger.getLogger(AuthServlet.class.getName());
     private final UsuarioDAO usuarioDAO = new UsuarioDAO();
 
     /**
@@ -58,6 +61,7 @@ public class AuthServlet extends HttpServlet {
             LoginRequestDTO loginDTO = MAPPER.readValue(request.getReader(), LoginRequestDTO.class);
 
             // Aplicar validaciones centralizadas (correo válido y contraseña obligatoria)
+            ValidatorUtil.validarNoNulo(loginDTO, "cuerpo de la petición");
             ValidatorUtil.validarEmail(loginDTO.getEmail());
             ValidatorUtil.validarTextoObligatorio(loginDTO.getPassword(), "password");
 
@@ -77,26 +81,26 @@ public class AuthServlet extends HttpServlet {
                 abrirSesion(request, usuario, responseDTO);
 
                 // Retornar 200 OK con la estructura ApiResponse exitosa
-                response.setStatus(HttpServletResponse.SC_OK);
-                MAPPER.writeValue(response.getOutputStream(), new ApiResponse<>(true, "Login exitoso", responseDTO));
+                ApiResponseWriter.write(response, HttpServletResponse.SC_OK,
+                        new ApiResponse<>(true, "Login exitoso", responseDTO), LOGGER, "iniciar sesión");
             } else {
                 // Retornar 401 Unauthorized si las credenciales son incorrectas
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                MAPPER.writeValue(response.getOutputStream(), new ApiResponse<>(false, "Credenciales inválidas", null));
+                ApiResponseWriter.write(response, HttpServletResponse.SC_UNAUTHORIZED,
+                        new ApiResponse<>(false, "Credenciales inválidas", null), LOGGER, "iniciar sesión");
             }
 
         } catch (JsonProcessingException e) {
             // JSON mal formado o con tipos incorrectos (400 Bad Request)
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            MAPPER.writeValue(response.getOutputStream(), new ApiResponse<>(false, "El cuerpo de la petición no es un JSON válido", null));
+            ApiResponseWriter.write(response, HttpServletResponse.SC_BAD_REQUEST,
+                    new ApiResponse<>(false, "El cuerpo de la petición no es un JSON válido", null),
+                    LOGGER, "iniciar sesión");
         } catch (IllegalArgumentException e) {
             // Capturar errores de validación de negocio (400 Bad Request)
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            MAPPER.writeValue(response.getOutputStream(), new ApiResponse<>(false, e.getMessage(), null));
+            ApiResponseWriter.write(response, HttpServletResponse.SC_BAD_REQUEST,
+                    new ApiResponse<>(false, e.getMessage(), null), LOGGER, "iniciar sesión");
         } catch (Exception e) {
             // Capturar errores inesperados del servidor (500 Internal Server Error)
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            MAPPER.writeValue(response.getOutputStream(), new ApiResponse<>(false, "Error interno en el servidor", null));
+            ApiResponseWriter.writeInternalError(response, LOGGER, "iniciar sesión", e);
         }
     }
 
@@ -122,7 +126,7 @@ public class AuthServlet extends HttpServlet {
         if (sesion != null) {
             sesion.invalidate();
         }
-        response.setStatus(HttpServletResponse.SC_OK);
-        MAPPER.writeValue(response.getOutputStream(), new ApiResponse<>(true, "Sesión cerrada", null));
+        ApiResponseWriter.write(response, HttpServletResponse.SC_OK,
+                new ApiResponse<>(true, "Sesión cerrada", null), LOGGER, "cerrar sesión");
     }
 }

@@ -1,7 +1,11 @@
 "use strict";
 
 (() => {
-    const API_LOGIN = new URL("../api/auth/login", document.baseURI);
+    const API_BASE_URL = new URL(
+        document.querySelector('meta[name="api-base-url"]').content,
+        document.baseURI
+    );
+    const API_LOGIN = new URL("auth/login", API_BASE_URL);
 
     const formulario = document.getElementById("formLogin");
     const correo = document.getElementById("email");
@@ -74,7 +78,7 @@
                 },
 
                 // Envía y recibe la cookie de sesión del mismo servidor.
-                credentials: "same-origin",
+                credentials: "include",
 
                 cache: "no-store",
                 signal: controlador.signal,

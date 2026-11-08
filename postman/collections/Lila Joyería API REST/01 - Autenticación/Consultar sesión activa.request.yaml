@@ -1,0 +1,8 @@
+$kind: http-request
+url: "{{baseUrl}}/api/auth/sesion"
+method: GET
+scripts:
+  - type: afterResponse
+    code: pm.test('Sesión activa devuelve 200', function () { pm.response.to.have.status(200); pm.expect(pm.response.json().datos.rol).to.eql('ADMIN'); });
+    language: text/javascript
+order: 2000

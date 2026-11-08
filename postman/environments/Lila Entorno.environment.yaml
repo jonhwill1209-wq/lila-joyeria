@@ -1,0 +1,9 @@
+name: Lila Entorno
+values:
+  - key: baseUrl
+    value: ''
+  - key: adminEmail
+    value: ''
+  - key: adminPassword
+    value: ''
+color: 300

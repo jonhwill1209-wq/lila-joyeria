@@ -1,0 +1,25 @@
+$kind: http-request
+url: "{{baseUrl}}/api/joyas"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "nombre": "Joya Postman CRUD",
+      "material": "Oro",
+      "descripcion": "Registro temporal de prueba",
+      "quilates": 18.0,
+      "precio": 150.00,
+      "stock": 5,
+      "idCategoria": 1
+    }
+scripts:
+  - type: beforeRequest
+    code: pm.collectionVariables.unset('createdJoyaId');
+    language: text/javascript
+  - type: afterResponse
+    code: pm.test('Crear devuelve 201 y asigna ID', function () { pm.response.to.have.status(201); const data = pm.response.json().datos; pm.expect(data.idJoya).to.be.a('number'); pm.collectionVariables.set('createdJoyaId', data.idJoya); });
+    language: text/javascript
+order: 1000

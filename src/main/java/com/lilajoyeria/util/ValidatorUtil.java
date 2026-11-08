@@ -45,5 +45,29 @@ public final class ValidatorUtil {
                     "El precio debe ser mayor que cero."
             );
         }
+        if (precio.compareTo(new BigDecimal("99999999.99")) > 0
+                || precio.stripTrailingZeros().scale() > 2) {
+            throw new IllegalArgumentException(
+                    "El precio no puede superar 99999999.99 ni tener más de dos decimales."
+            );
+        }
+    }
+
+    public static void validarQuilates(BigDecimal quilates) {
+        if (quilates != null && (quilates.compareTo(BigDecimal.ZERO) < 0
+                || quilates.compareTo(new BigDecimal("99.99")) > 0
+                || quilates.stripTrailingZeros().scale() > 2)) {
+            throw new IllegalArgumentException(
+                    "Los quilates deben estar entre 0 y 99.99 con un máximo de dos decimales."
+            );
+        }
+    }
+
+    public static void validarLongitudMaxima(String valor, int maximo, String nombreCampo) {
+        if (valor != null && valor.length() > maximo) {
+            throw new IllegalArgumentException(
+                    "El campo " + nombreCampo + " no puede superar " + maximo + " caracteres."
+            );
+        }
     }
 }

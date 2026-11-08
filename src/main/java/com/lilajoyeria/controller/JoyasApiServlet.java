@@ -3,11 +3,13 @@ package com.lilajoyeria.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lilajoyeria.dao.JoyaDAO;
+import com.lilajoyeria.dao.CategoriaDAO;
 import com.lilajoyeria.dto.JoyaDTO;
 import com.lilajoyeria.model.Categoria;
 import com.lilajoyeria.model.Joya;
 import com.lilajoyeria.util.ValidatorUtil;
 import com.lilajoyeria.utilidades.ApiResponse;
+import com.lilajoyeria.utilidades.ApiResponseWriter;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,6 +18,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Servlet central para la gestión de operaciones REST sobre el recurso Joyas (/api/joyas/*).
@@ -27,9 +30,11 @@ import java.util.List;
 @WebServlet("/api/joyas/*")
 public class JoyasApiServlet extends HttpServlet {
     private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final Logger LOGGER = Logger.getLogger(JoyasApiServlet.class.getName());
 
     // Instancia del DAO inicializada mediante el constructor por defecto JPAUtil
     private final JoyaDAO joyaDAO = new JoyaDAO();
+    private final CategoriaDAO categoriaDAO = new CategoriaDAO();
 
     /**
      * Maneja las peticiones HTTP GET públicas para listar todas las joyas o buscar una por su ID.
@@ -97,6 +102,9 @@ public class JoyasApiServlet extends HttpServlet {
             ValidatorUtil.validarTextoObligatorio(joyaDTO.getMaterial(), "material");
             ValidatorUtil.validarPrecioMayorQueCero(joyaDTO.getPrecio());
             ValidatorUtil.validarNoNulo(joyaDTO.getStock(), "stock");
+            ValidatorUtil.validarQuilates(joyaDTO.getQuilates());
+            ValidatorUtil.validarLongitudMaxima(joyaDTO.getImagen(), 150, "imagen");
+            validarCategoria(joyaDTO.getIdCategoria());
 
             // Mapear DTO al modelo de dominio (los setters de Joya validan longitudes y negativos)
             Joya nuevaJoya = new Joya();
@@ -133,8 +141,7 @@ public class JoyasApiServlet extends HttpServlet {
             escribirRespuesta(response, HttpServletResponse.SC_BAD_REQUEST,
                     new ApiResponse<>(false, e.getMessage(), null));
         } catch (Exception e) {
-            // Manejo de excepciones generales / base de datos (500 Internal Server Error)
-            escribirErrorInterno(response);
+            ApiResponseWriter.writeInternalError(response, LOGGER, "crear joya", e);
         }
     }
 
@@ -159,6 +166,11 @@ public class JoyasApiServlet extends HttpServlet {
             }
 
             int id = Integer.parseInt(pathInfo.substring(1));
+            if (id <= 0) {
+                escribirRespuesta(response, HttpServletResponse.SC_BAD_REQUEST,
+                        new ApiResponse<>(false, "El identificador de la joya debe ser mayor que cero", null));
+                return;
+            }
             JoyaDTO joyaDTO = MAPPER.readValue(request.getReader(), JoyaDTO.class);
 
             // Validaciones de entrada
@@ -167,6 +179,9 @@ public class JoyasApiServlet extends HttpServlet {
             ValidatorUtil.validarTextoObligatorio(joyaDTO.getMaterial(), "material");
             ValidatorUtil.validarPrecioMayorQueCero(joyaDTO.getPrecio());
             ValidatorUtil.validarNoNulo(joyaDTO.getStock(), "stock");
+            ValidatorUtil.validarQuilates(joyaDTO.getQuilates());
+            ValidatorUtil.validarLongitudMaxima(joyaDTO.getImagen(), 150, "imagen");
+            validarCategoria(joyaDTO.getIdCategoria());
 
             // Verificar existencia previa de la joya
             Joya joyaExistente = joyaDAO.buscarPorId(id);
@@ -217,7 +232,7 @@ public class JoyasApiServlet extends HttpServlet {
             escribirRespuesta(response, HttpServletResponse.SC_BAD_REQUEST,
                     new ApiResponse<>(false, e.getMessage(), null));
         } catch (Exception e) {
-            escribirErrorInterno(response);
+            ApiResponseWriter.writeInternalError(response, LOGGER, "actualizar joya", e);
         }
     }
 
@@ -242,6 +257,11 @@ public class JoyasApiServlet extends HttpServlet {
             }
 
             int id = Integer.parseInt(pathInfo.substring(1));
+            if (id <= 0) {
+                escribirRespuesta(response, HttpServletResponse.SC_BAD_REQUEST,
+                        new ApiResponse<>(false, "El identificador de la joya debe ser mayor que cero", null));
+                return;
+            }
             boolean eliminado = joyaDAO.eliminar(id);
 
             if (eliminado) {
@@ -254,7 +274,7 @@ public class JoyasApiServlet extends HttpServlet {
             escribirRespuesta(response, HttpServletResponse.SC_BAD_REQUEST,
                     new ApiResponse<>(false, "El identificador de la joya debe ser un número entero", null));
         } catch (Exception e) {
-            escribirErrorInterno(response);
+            ApiResponseWriter.writeInternalError(response, LOGGER, "eliminar joya", e);
         }
     }
 
@@ -267,7 +287,7 @@ public class JoyasApiServlet extends HttpServlet {
             escribirRespuesta(response, HttpServletResponse.SC_OK,
                     new ApiResponse<>(true, "Catálogo de joyas", joyas));
         } catch (SQLException e) {
-            escribirErrorInterno(response);
+            ApiResponseWriter.writeInternalError(response, LOGGER, "listar joyas", e);
         }
     }
 
@@ -285,7 +305,7 @@ public class JoyasApiServlet extends HttpServlet {
             escribirRespuesta(response, HttpServletResponse.SC_OK,
                     new ApiResponse<>(true, "Joya encontrada", joya));
         } catch (SQLException e) {
-            escribirErrorInterno(response);
+            ApiResponseWriter.writeInternalError(response, LOGGER, "buscar joya " + id, e);
         }
     }
 
@@ -295,14 +315,16 @@ public class JoyasApiServlet extends HttpServlet {
     private void configurarRespuesta(HttpServletResponse response) {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
+        response.setHeader("Cache-Control", "no-store");
     }
 
-    /**
-     * Envía una respuesta estandarizada ante errores internos de servidor (500 Internal Server Error).
-     */
-    private void escribirErrorInterno(HttpServletResponse response) throws IOException {
-        escribirRespuesta(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                new ApiResponse<>(false, "Ocurrió un error en el servidor", null));
+    private void validarCategoria(int idCategoria) throws SQLException {
+        if (idCategoria < 0) {
+            throw new IllegalArgumentException("El identificador de categoría no puede ser negativo");
+        }
+        if (idCategoria > 0 && categoriaDAO.buscarPorId(idCategoria) == null) {
+            throw new IllegalArgumentException("La categoría indicada no existe");
+        }
     }
 
     /**
@@ -310,7 +332,6 @@ public class JoyasApiServlet extends HttpServlet {
      */
     private void escribirRespuesta(HttpServletResponse response, int status, ApiResponse<?> cuerpo)
             throws IOException {
-        response.setStatus(status);
-        MAPPER.writeValue(response.getOutputStream(), cuerpo);
+        ApiResponseWriter.write(response, status, cuerpo, LOGGER, "gestión de joyas");
     }
 }

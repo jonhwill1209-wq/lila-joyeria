@@ -1,0 +1,19 @@
+$kind: http-request
+url: "{{baseUrl}}/api/auth/login"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "email": "{{adminEmail}}",
+      "password": "{{adminPassword}}"
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Login crea sesión ADMIN', function () { pm.response.to.have.status(200, pm.response.json().mensaje); const body = pm.response.json(); pm.expect(body.datos).to.be.an('object'); pm.expect(body.datos.rol).to.eql('ADMIN'); });
+      pm.test('La respuesta no expone contraseña', function () { const body = pm.response.json(); pm.expect(body.datos).to.be.an('object', 'El login debe ser exitoso antes de revisar los datos públicos'); pm.expect(body.datos).to.not.have.property('password'); });
+    language: text/javascript
+order: 1000

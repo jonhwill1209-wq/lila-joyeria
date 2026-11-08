@@ -1,0 +1,19 @@
+$kind: http-request
+url: "{{baseUrl}}/api/joyas"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "nombre": "No autorizada",
+      "material": "Oro",
+      "precio": 1,
+      "stock": 1
+    }
+scripts:
+  - type: afterResponse
+    code: pm.test('Mutación sin sesión se rechaza con 401', function () { pm.response.to.have.status(401); pm.expect(pm.response.json().exito).to.eql(false); });
+    language: text/javascript
+order: 2000

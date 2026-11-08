@@ -1,9 +1,13 @@
 "use strict";
 
 (() => {
-    const apiJoyas = new URL("../api/joyas", document.baseURI);
-    const apiSesion = new URL("../api/auth/sesion", document.baseURI);
-    const apiLogout = new URL("../api/auth/logout", document.baseURI);
+    const apiBaseUrl = new URL(
+        document.querySelector('meta[name="api-base-url"]').content,
+        document.baseURI
+    );
+    const apiJoyas = new URL("joyas", apiBaseUrl);
+    const apiSesion = new URL("auth/sesion", apiBaseUrl);
+    const apiLogout = new URL("auth/logout", apiBaseUrl);
 
     const ui = {
         panel: document.querySelector(".gestion-preparacion"),
@@ -22,6 +26,7 @@
         categoriasCatalogo: document.getElementById("categoria"),
         cancelar: document.getElementById("btnCancelarJoya"),
         guardar: document.querySelector("#formJoya button[type='submit']"),
+        productos: document.getElementById("productos"),
         recargar: document.getElementById("btnRecargar"),
         navegacion: document.querySelector(
             'nav[aria-label="Navegación principal"]'
@@ -201,6 +206,7 @@
     function actualizarSesion(datos) {
         usuario = datos;
         ui.panel.hidden = !esAdmin();
+        actualizarBotonesEliminar();
 
         if (enlaceLogin) {
             enlaceLogin.hidden = usuario !== null;
@@ -231,7 +237,7 @@
         try {
             const respuesta = await fetch(url, {
                 ...opciones,
-                credentials: "same-origin",
+                credentials: "include",
                 cache: "no-store",
                 signal: controlador.signal,
                 headers: {
@@ -242,6 +248,14 @@
                     ...opciones.headers
                 }
             });
+
+            if (respuesta.status === 204) {
+                return {
+                    exito: true,
+                    mensaje: "Operación completada.",
+                    datos: null
+                };
+            }
 
             let cuerpo;
 
@@ -587,6 +601,54 @@
             : "No tienes permisos de administrador. Inicia sesión con una cuenta autorizada.";
     }
 
+    function actualizarBotonesEliminar() {
+        for (const boton of ui.productos.querySelectorAll(
+            "[data-eliminar-joya]"
+        )) {
+            boton.hidden = !esAdmin();
+        }
+    }
+
+    async function eliminarJoya(evento) {
+        const boton = evento.target instanceof Element
+            ? evento.target.closest("[data-eliminar-joya]")
+            : null;
+        if (!boton || ocupado || !esAdmin()) {
+            return;
+        }
+
+        const id = Number(boton.dataset.eliminarJoya);
+        if (!Number.isSafeInteger(id) || id <= 0) {
+            mostrarMensaje("La joya no tiene un identificador válido.", "error");
+            return;
+        }
+
+        if (!window.confirm(`¿Eliminar la joya #${id}? Esta acción no se puede deshacer.`)) {
+            return;
+        }
+
+        establecerOcupado(true);
+        boton.disabled = true;
+        mostrarMensaje(`Eliminando la joya #${id}…`);
+
+        try {
+            await solicitar(`${apiJoyas.href.replace(/\/$/, "")}/${id}`, {
+                method: "DELETE"
+            });
+            mostrarMensaje(`La joya #${id} fue eliminada.`, "exito");
+            ui.recargar.click();
+        } catch (error) {
+            if (error.status === 401 || error.status === 403) {
+                await actualizarTrasRechazo(error);
+            } else {
+                mostrarMensaje(error.message, "error");
+            }
+        } finally {
+            boton.disabled = false;
+            establecerOcupado(false);
+        }
+    }
+
     async function cerrarSesion() {
         if (ocupado) {
             return;
@@ -615,6 +677,8 @@
     ui.cancelar.addEventListener("click", cerrarFormulario);
     ui.consultar.addEventListener("submit", cargarParaEditar);
     ui.formulario.addEventListener("submit", guardarJoya);
+    ui.productos.addEventListener("click", eliminarJoya);
+    window.addEventListener("lila:catalogo-renderizado", actualizarBotonesEliminar);
     botonSalir.addEventListener("click", cerrarSesion);
 
     ui.formulario.addEventListener("input", (evento) => {
@@ -624,6 +688,8 @@
 
         ocultarMensaje();
     });
+
+    actualizarBotonesEliminar();
 
     // Revisa la sesión al volver desde otra pestaña.
     window.addEventListener("focus", consultarSesion);

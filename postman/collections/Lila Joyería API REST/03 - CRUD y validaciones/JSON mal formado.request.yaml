@@ -1,0 +1,13 @@
+$kind: http-request
+url: "{{baseUrl}}/api/joyas"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: '{"nombre":'
+scripts:
+  - type: afterResponse
+    code: pm.test('JSON inválido se rechaza con 400', function () { pm.response.to.have.status(400); pm.expect(pm.response.json().exito).to.eql(false); });
+    language: text/javascript
+order: 5000

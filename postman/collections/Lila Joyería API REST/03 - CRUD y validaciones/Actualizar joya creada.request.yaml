@@ -1,0 +1,20 @@
+$kind: http-request
+url: "{{baseUrl}}/api/joyas/{{createdJoyaId}}"
+method: PUT
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "nombre": "Joya Postman actualizada",
+      "material": "Plata",
+      "precio": 175.00,
+      "stock": 2,
+      "idCategoria": 1
+    }
+scripts:
+  - type: afterResponse
+    code: pm.test('Actualizar devuelve 200', function () { pm.response.to.have.status(200); pm.expect(pm.response.json().datos.nombre).to.eql('Joya Postman actualizada'); });
+    language: text/javascript
+order: 2000

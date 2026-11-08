@@ -1,0 +1,8 @@
+$kind: http-request
+url: "{{baseUrl}}/api/joyas/0"
+method: GET
+scripts:
+  - type: afterResponse
+    code: pm.test('ID cero se rechaza con 400', function () { pm.response.to.have.status(400); pm.expect(pm.response.json().exito).to.eql(false); });
+    language: text/javascript
+order: 3000

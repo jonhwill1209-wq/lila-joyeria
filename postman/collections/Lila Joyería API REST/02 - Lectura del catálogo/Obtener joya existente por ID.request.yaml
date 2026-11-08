@@ -1,0 +1,8 @@
+$kind: http-request
+url: "{{baseUrl}}/api/joyas/{{joyaId}}"
+method: GET
+scripts:
+  - type: afterResponse
+    code: pm.test('Joya existente devuelve 200', function () { pm.response.to.have.status(200); pm.expect(pm.response.json().datos.idJoya).to.eql(Number(pm.variables.get('joyaId'))); });
+    language: text/javascript
+order: 2000

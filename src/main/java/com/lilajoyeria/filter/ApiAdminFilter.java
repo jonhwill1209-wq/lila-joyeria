@@ -1,20 +1,20 @@
 package com.lilajoyeria.filter;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lilajoyeria.bean.AuthBean;
 import com.lilajoyeria.model.RolUsuario;
 import com.lilajoyeria.utilidades.ApiResponse;
+import com.lilajoyeria.utilidades.ApiResponseWriter;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
-import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.util.logging.Logger;
 
 /**
  * Control de acceso de la API REST: las lecturas (GET) de /api/joyas/* son públicas,
@@ -26,10 +26,9 @@ import java.io.IOException;
  * Usa el mismo atributo de sesión que AccesoFilter (AuthBean.ATRIBUTO_ROL), así que
  * el login de la API y el de JSF comparten el mismo control de rol.
  */
-@WebFilter(filterName = "ApiAdminFilter", urlPatterns = {"/api/joyas", "/api/joyas/*"})
 public class ApiAdminFilter implements Filter {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final Logger LOGGER = Logger.getLogger(ApiAdminFilter.class.getName());
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -53,23 +52,33 @@ public class ApiAdminFilter implements Filter {
 
         if (rol == null) {
             rechazar(res, HttpServletResponse.SC_UNAUTHORIZED,
-                    "Debes iniciar sesión para realizar esta operación");
+                    "Debes iniciar sesión para realizar esta operación", req);
             return;
         }
 
         if (rol != RolUsuario.ADMIN) {
             rechazar(res, HttpServletResponse.SC_FORBIDDEN,
-                    "Solo un administrador puede realizar esta operación");
+                    "Solo un administrador puede realizar esta operación", req);
             return;
         }
 
+        LOGGER.info(() -> "API mutation authorized: " + req.getMethod() + " "
+                + req.getRequestURI() + " role=ADMIN");
         chain.doFilter(request, response);
     }
 
-    private void rechazar(HttpServletResponse res, int status, String mensaje) throws IOException {
-        res.setStatus(status);
-        res.setContentType("application/json");
-        res.setCharacterEncoding("UTF-8");
-        MAPPER.writeValue(res.getOutputStream(), new ApiResponse<>(false, mensaje, null));
+    private void rechazar(
+            HttpServletResponse res,
+            int status,
+            String mensaje,
+            HttpServletRequest request
+    ) throws IOException {
+        ApiResponseWriter.write(
+                res,
+                status,
+                new ApiResponse<>(false, mensaje, null),
+                LOGGER,
+                request.getMethod() + " " + request.getRequestURI()
+        );
     }
 }

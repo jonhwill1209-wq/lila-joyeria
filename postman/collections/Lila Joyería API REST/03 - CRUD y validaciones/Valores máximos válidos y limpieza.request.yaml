@@ -1,0 +1,22 @@
+$kind: http-request
+url: "{{baseUrl}}/api/joyas"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "nombre": "0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789",
+      "material": "12345123451234512345123451234512345123451234512345",
+      "precio": 99999999.99,
+      "stock": 2147483647
+    }
+scripts:
+  - type: beforeRequest
+    code: pm.collectionVariables.unset('boundaryJoyaId');
+    language: text/javascript
+  - type: afterResponse
+    code: pm.test('Límites válidos se aceptan y guardan ID', function () { pm.response.to.have.status(201); const data = pm.response.json().datos; pm.expect(data.nombre).to.have.lengthOf(100); pm.expect(data.material).to.have.lengthOf(50); pm.collectionVariables.set('boundaryJoyaId', data.idJoya); });
+    language: text/javascript
+order: 6000

@@ -43,6 +43,40 @@ class ValidatorUtilTest {
     }
 
     @Test
+    void aceptaYRechazaLimitesDePrecio() {
+        assertDoesNotThrow(() ->
+                ValidatorUtil.validarPrecioMayorQueCero(new BigDecimal("99999999.99"))
+        );
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> ValidatorUtil.validarPrecioMayorQueCero(new BigDecimal("100000000.00"))
+        );
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> ValidatorUtil.validarPrecioMayorQueCero(new BigDecimal("10.001"))
+        );
+    }
+
+    @Test
+    void validaLimitesDeQuilates() {
+        assertDoesNotThrow(() -> ValidatorUtil.validarQuilates(new BigDecimal("99.99")));
+        assertDoesNotThrow(() -> ValidatorUtil.validarQuilates(null));
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> ValidatorUtil.validarQuilates(new BigDecimal("100.00"))
+        );
+    }
+
+    @Test
+    void validaLongitudMaximaDeCamposOpcionales() {
+        assertDoesNotThrow(() -> ValidatorUtil.validarLongitudMaxima(null, 150, "imagen"));
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> ValidatorUtil.validarLongitudMaxima("x".repeat(151), 150, "imagen")
+        );
+    }
+
+    @Test
     void rechazaTextoVacio() {
         assertThrows(
                 IllegalArgumentException.class,

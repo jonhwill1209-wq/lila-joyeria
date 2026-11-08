@@ -1,0 +1,8 @@
+$kind: http-request
+url: "{{baseUrl}}/api/joyas/{{boundaryJoyaId}}"
+method: DELETE
+scripts:
+  - type: afterResponse
+    code: pm.test('DELETE devuelve 204 sin cuerpo', function () { pm.response.to.have.status(204); pm.expect(pm.response.text()).to.eql(''); });
+    language: text/javascript
+order: 7000

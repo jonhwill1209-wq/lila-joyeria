@@ -1,6 +1,10 @@
 "use strict";
 
-const API_JOYAS = new URL("../api/joyas", document.baseURI);
+const API_BASE_URL = new URL(
+    document.querySelector('meta[name="api-base-url"]').content,
+    document.baseURI
+);
+const API_JOYAS = new URL("joyas", API_BASE_URL);
 
 const elementos = {
     formulario: document.getElementById("formFiltros"),
@@ -108,6 +112,7 @@ function crearImagen(joya) {
 function crearTarjeta(joya, incluirBoton = true) {
     const tarjeta = document.createElement("article");
     tarjeta.className = "tarjeta";
+    tarjeta.dataset.idJoya = String(joya.idJoya ?? "");
 
     const contenido = document.createElement("div");
     contenido.className = "tarjeta-contenido";
@@ -179,6 +184,14 @@ function crearTarjeta(joya, incluirBoton = true) {
         });
 
         contenido.append(boton);
+
+        const botonEliminar = document.createElement("button");
+        botonEliminar.type = "button";
+        botonEliminar.className = "boton boton-secundario boton-eliminar-rest";
+        botonEliminar.textContent = "Eliminar";
+        botonEliminar.dataset.eliminarJoya = String(joya.idJoya ?? "");
+        botonEliminar.hidden = true;
+        contenido.append(botonEliminar);
     }
 
     tarjeta.append(crearImagen(joya), contenido);
@@ -251,6 +264,7 @@ function aplicarFiltros() {
     }
 
     elementos.productos.replaceChildren(fragmento);
+    window.dispatchEvent(new Event("lila:catalogo-renderizado"));
     elementos.contador.textContent =
         `${filtradas.length} de ${joyas.length} joyas`;
 

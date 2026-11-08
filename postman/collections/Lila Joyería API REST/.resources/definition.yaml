@@ -1,0 +1,24 @@
+$kind: collection
+description: Suite Postman secuencial para contrato, CRUD, validaciones, límites y control de sesión. Seleccionar un entorno local con adminEmail y adminPassword configurados antes de ejecutar.
+variables:
+  baseUrl: http://localhost:8081/lila_joyeria_war_exploded
+  joyaId: "1"
+  boundaryJoyaId: ""
+  adminEmail: ""
+  adminPassword: ""
+  createdJoyaId: ""
+scripts:
+  - type: http:afterResponse
+    code: |-
+      if (pm.response.code === 204) {
+        pm.test('204 no contiene cuerpo', function () { pm.expect(pm.response.text()).to.eql(''); });
+      } else {
+        pm.test('Respuesta JSON con contrato común', function () {
+          pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');
+          const body = pm.response.json();
+          pm.expect(body.exito).to.be.a('boolean');
+          pm.expect(body.mensaje).to.be.a('string');
+          pm.expect(body).to.have.property('datos');
+        });
+      }
+    language: text/javascript

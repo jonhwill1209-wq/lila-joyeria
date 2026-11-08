@@ -103,3 +103,10 @@ La unidad `lilaJoyeriaPU` valida el esquema existente y no modifica tablas.
 Ejecutar `mvn clean package` para probar y generar `target/lila-joyeria.war`.
 Las cuatro pruebas JUnit usan H2; las pruebas de integraci?n MySQL y las decisiones
 para la defensa t?cnica se describen en [Persona 1: persistencia](docs/persona-1-persistencia.md).
+
+## API REST
+
+El contrato de endpoints, reglas de validación, autenticación, configuración CORS y
+guía para ejecutar la colección Postman están en [Documentación de la API REST](docs/api-rest.md).
+La colección está disponible en `LilaJoyeria_API.postman_collection.json`; el
+backlog y el registro de defectos están en `docs/api-backlog.md` y `docs/api-defects.md`.

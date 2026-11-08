@@ -1,0 +1,8 @@
+$kind: http-request
+url: "{{baseUrl}}/api/joyas/{{createdJoyaId}}"
+method: DELETE
+scripts:
+  - type: afterResponse
+    code: pm.test('DELETE devuelve 204', function () { pm.response.to.have.status(204); });
+    language: text/javascript
+order: 8000

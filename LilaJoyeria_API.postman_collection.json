@@ -1,127 +1,225 @@
 {
   "info": {
-    "name": "Lila Joyería API",
-    "description": "Colección base para probar los endpoints de Joyas, Usuarios y Pedidos.",
+    "name": "Lila Joyería API REST",
+    "description": "Suite Postman secuencial para contrato, CRUD, validaciones, límites y control de sesión. Seleccionar un entorno local con adminEmail y adminPassword configurados antes de ejecutar.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8081/lila_joyeria_war_exploded" },
+    { "key": "joyaId", "value": "1" },
+    { "key": "createdJoyaId", "value": "" },
+    { "key": "boundaryJoyaId", "value": "" },
+    { "key": "adminEmail", "value": "" },
+    { "key": "adminPassword", "value": "" }
+  ],
+  "event": [
     {
-      "key": "baseUrl",
-      "value": "http://localhost:8080/lila-joyeria"
-    },
-    {
-      "key": "joyaId",
-      "value": "1"
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "if (pm.response.code === 204) {",
+          "  pm.test('204 no contiene cuerpo', function () { pm.expect(pm.response.text()).to.eql(''); });",
+          "} else {",
+          "  pm.test('Respuesta JSON con contrato común', function () {",
+          "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+          "    const body = pm.response.json();",
+          "    pm.expect(body.exito).to.be.a('boolean');",
+          "    pm.expect(body.mensaje).to.be.a('string');",
+          "    pm.expect(body).to.have.property('datos');",
+          "  });",
+          "}"
+        ]
+      }
     }
   ],
   "item": [
     {
-      "name": "Auth",
+      "name": "01 - Autenticación",
       "item": [
         {
-          "name": "Login ADMIN (abre sesión)",
+          "name": "Login ADMIN",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Login crea sesión ADMIN', function () { pm.response.to.have.status(200, pm.response.json().mensaje); const body = pm.response.json(); pm.expect(body.datos).to.be.an('object'); pm.expect(body.datos.rol).to.eql('ADMIN'); });",
+            "pm.test('La respuesta no expone contraseña', function () { const body = pm.response.json(); pm.expect(body.datos).to.be.an('object', 'El login debe ser exitoso antes de revisar los datos públicos'); pm.expect(body.datos).to.not.have.property('password'); });"
+          ]}}],
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "url": "{{baseUrl}}/api/auth/login",
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"admin@lila.com\",\n  \"password\": \"CAMBIAR\"\n}"
-            }
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"{{adminPassword}}\"\n}", "options": { "raw": { "language": "json" } } }
           },
           "response": []
         },
         {
-          "name": "Logout",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "url": "{{baseUrl}}/api/auth/logout"
-          },
+          "name": "Consultar sesión activa",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Sesión activa devuelve 200', function () { pm.response.to.have.status(200); pm.expect(pm.response.json().datos.rol).to.eql('ADMIN'); });"
+          ]}}],
+          "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/api/auth/sesion" },
           "response": []
         }
       ]
     },
     {
-      "name": "Joyas",
+      "name": "02 - Lectura del catálogo",
       "item": [
         {
           "name": "Listar joyas",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": "{{baseUrl}}/api/joyas"
-          },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Catálogo devuelve lista', function () { pm.response.to.have.status(200); pm.expect(pm.response.json().datos).to.be.an('array'); });"
+          ]}}],
+          "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/api/joyas" },
           "response": []
         },
         {
-          "name": "Obtener joya por ID",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": "{{baseUrl}}/api/joyas/{{joyaId}}"
-          },
-          "response": []
-        },
-        {
-          "name": "Crear joya (ADMIN)",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": "{{baseUrl}}/api/joyas",
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"nombre\": \"Anillo Prueba\",\n  \"material\": \"Oro\",\n  \"descripcion\": \"Joya de prueba\",\n  \"quilates\": 18.0,\n  \"precio\": 150.0,\n  \"stock\": 5,\n  \"idCategoria\": 1\n}"
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Actualizar joya (ADMIN)",
-          "request": {
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": "{{baseUrl}}/api/joyas/{{joyaId}}",
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"nombre\": \"Anillo Prueba\",\n  \"material\": \"Oro\",\n  \"descripcion\": \"Joya de prueba\",\n  \"quilates\": 18.0,\n  \"precio\": 150.0,\n  \"stock\": 5,\n  \"idCategoria\": 1\n}"
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Eliminar joya (ADMIN)",
-          "request": {
-            "method": "DELETE",
-            "header": [],
-            "url": "{{baseUrl}}/api/joyas/{{joyaId}}"
-          },
+          "name": "Obtener joya existente por ID",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Joya existente devuelve 200', function () { pm.response.to.have.status(200); pm.expect(pm.response.json().datos.idJoya).to.eql(Number(pm.variables.get('joyaId'))); });"
+          ]}}],
+          "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/api/joyas/{{joyaId}}" },
           "response": []
         }
       ]
     },
     {
-      "name": "Usuarios",
-      "item": []
+      "name": "03 - CRUD y validaciones",
+      "item": [
+        {
+          "name": "Crear joya válida",
+          "event": [
+            { "listen": "prerequest", "script": { "type": "text/javascript", "exec": [
+              "pm.collectionVariables.unset('createdJoyaId');"
+            ]}},
+            { "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Crear devuelve 201 y asigna ID', function () { pm.response.to.have.status(201); const data = pm.response.json().datos; pm.expect(data.idJoya).to.be.a('number'); pm.collectionVariables.set('createdJoyaId', data.idJoya); });"
+            ]}}
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/joyas",
+            "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Joya Postman CRUD\",\n  \"material\": \"Oro\",\n  \"descripcion\": \"Registro temporal de prueba\",\n  \"quilates\": 18.0,\n  \"precio\": 150.00,\n  \"stock\": 5,\n  \"idCategoria\": 1\n}", "options": { "raw": { "language": "json" } } }
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar joya creada",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Actualizar devuelve 200', function () { pm.response.to.have.status(200); pm.expect(pm.response.json().datos.nombre).to.eql('Joya Postman actualizada'); });"
+          ]}}],
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/joyas/{{createdJoyaId}}",
+            "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Joya Postman actualizada\",\n  \"material\": \"Plata\",\n  \"precio\": 175.00,\n  \"stock\": 2,\n  \"idCategoria\": 1\n}", "options": { "raw": { "language": "json" } } }
+          },
+          "response": []
+        },
+        {
+          "name": "ID cero (límite inválido)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('ID cero se rechaza con 400', function () { pm.response.to.have.status(400); pm.expect(pm.response.json().exito).to.eql(false); });"
+          ]}}],
+          "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/api/joyas/0" },
+          "response": []
+        },
+        {
+          "name": "Nombre obligatorio vacío",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Campo obligatorio vacío se rechaza con 400', function () { pm.response.to.have.status(400); pm.expect(pm.response.json().exito).to.eql(false); });"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/joyas",
+            "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"\",\n  \"material\": \"Oro\",\n  \"precio\": 10.00,\n  \"stock\": 1\n}", "options": { "raw": { "language": "json" } }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "JSON mal formado",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('JSON inválido se rechaza con 400', function () { pm.response.to.have.status(400); pm.expect(pm.response.json().exito).to.eql(false); });"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/joyas",
+            "body": { "mode": "raw", "raw": "{\"nombre\":", "options": { "raw": { "language": "json" } } }
+          },
+          "response": []
+        },
+        {
+          "name": "Valores máximos válidos y limpieza",
+          "event": [
+            { "listen": "prerequest", "script": { "type": "text/javascript", "exec": [
+              "pm.collectionVariables.unset('boundaryJoyaId');"
+            ]}},
+            { "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Límites válidos se aceptan y guardan ID', function () { pm.response.to.have.status(201); const data = pm.response.json().datos; pm.expect(data.nombre).to.have.lengthOf(100); pm.expect(data.material).to.have.lengthOf(50); pm.collectionVariables.set('boundaryJoyaId', data.idJoya); });"
+            ]}}
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/joyas",
+            "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789\",\n  \"material\": \"12345123451234512345123451234512345123451234512345\",\n  \"precio\": 99999999.99,\n  \"stock\": 2147483647\n}", "options": { "raw": { "language": "json" } } }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar registro de límites",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('DELETE devuelve 204 sin cuerpo', function () { pm.response.to.have.status(204); pm.expect(pm.response.text()).to.eql(''); });"
+          ]}}],
+          "request": { "method": "DELETE", "header": [], "url": "{{baseUrl}}/api/joyas/{{boundaryJoyaId}}" },
+          "response": []
+        },
+        {
+          "name": "Eliminar joya creada",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('DELETE devuelve 204', function () { pm.response.to.have.status(204); });"
+          ]}}],
+          "request": { "method": "DELETE", "header": [], "url": "{{baseUrl}}/api/joyas/{{createdJoyaId}}" },
+          "response": []
+        },
+        {
+          "name": "Consultar joya eliminada",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Recurso eliminado devuelve 404', function () { pm.response.to.have.status(404); pm.expect(pm.response.json().exito).to.eql(false); });"
+          ]}}],
+          "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/api/joyas/{{createdJoyaId}}" },
+          "response": []
+        }
+      ]
     },
     {
-      "name": "Pedidos",
-      "item": []
+      "name": "04 - Autorización",
+      "item": [
+        {
+          "name": "Cerrar sesión",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Logout devuelve 200', function () { pm.response.to.have.status(200); });"
+          ]}}],
+          "request": { "method": "POST", "header": [], "url": "{{baseUrl}}/api/auth/logout" },
+          "response": []
+        },
+        {
+          "name": "Crear sin sesión",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Mutación sin sesión se rechaza con 401', function () { pm.response.to.have.status(401); pm.expect(pm.response.json().exito).to.eql(false); });"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/joyas",
+            "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"No autorizada\",\n  \"material\": \"Oro\",\n  \"precio\": 1,\n  \"stock\": 1\n}", "options": { "raw": { "language": "json" } } }
+          },
+          "response": []
+        }
+      ]
     }
   ]
 }

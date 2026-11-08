@@ -1,0 +1,13 @@
+# Use this workspace to collaborate
+workspace:
+  id: 6f8561a1-a020-4eec-8022-0f46ae3e3f9d
+
+localResources:
+  collections:
+    - ../LilaJoyeria_API.postman_collection.json
+
+# Each entry here maps a local resource to one or more corresponding objects in Postman Cloud
+
+cloudResources:
+  collections:
+    ../postman/collections/Lila Joyería API REST: 7084b082-7962-4be1-a3e8-97030c9a8c3a
