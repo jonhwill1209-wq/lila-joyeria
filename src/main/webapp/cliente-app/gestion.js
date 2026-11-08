@@ -1,10 +1,12 @@
 "use strict";
 
-// Encapsulado para no interferir con las variables de app.js.
 (() => {
     const apiJoyas = new URL("../api/joyas", document.baseURI);
+    const apiSesion = new URL("../api/auth/sesion", document.baseURI);
+    const apiLogout = new URL("../api/auth/logout", document.baseURI);
 
     const ui = {
+        panel: document.querySelector(".gestion-preparacion"),
         nueva: document.getElementById("btnNuevaJoya"),
         consultar: document.getElementById("formConsultarEdicion"),
         idConsultar: document.getElementById("idConsultarJoya"),
@@ -18,13 +20,44 @@
         stock: document.getElementById("stockJoya"),
         categoria: document.getElementById("categoriaJoya"),
         categoriasCatalogo: document.getElementById("categoria"),
-        cancelar: document.getElementById("btnCancelarJoya")
+        cancelar: document.getElementById("btnCancelarJoya"),
+        guardar: document.querySelector("#formJoya button[type='submit']"),
+        recargar: document.getElementById("btnRecargar"),
+        navegacion: document.querySelector(
+            'nav[aria-label="Navegación principal"]'
+        )
     };
 
+    let usuario = null;
     let idEdicion = null;
-    let consultaActiva = null;
+    let ocupado = false;
+
+    ui.panel.hidden = true;
+    ui.formulario.hidden = true;
 
     instalarEstilos();
+    prepararTextos();
+
+    const estadoSesion = document.createElement("span");
+    estadoSesion.setAttribute("role", "status");
+    estadoSesion.setAttribute("aria-live", "polite");
+
+    const botonSalir = document.createElement("button");
+    botonSalir.type = "button";
+    botonSalir.className = "boton boton-secundario";
+    botonSalir.textContent = "Cerrar sesión";
+    botonSalir.hidden = true;
+
+    ui.navegacion.append(
+        document.createTextNode(" "),
+        estadoSesion,
+        document.createTextNode(" "),
+        botonSalir
+    );
+
+    const enlaceLogin = ui.navegacion.querySelector(
+        'a[href="login.html"]'
+    );
 
     function instalarEstilos() {
         const estilo = document.createElement("style");
@@ -32,6 +65,11 @@
         estilo.textContent = `
             .gestion-preparacion {
                 margin: 0 0 48px;
+            }
+
+            .gestion-preparacion[hidden],
+            .gestion-formulario[hidden] {
+                display: none !important;
             }
 
             .gestion-preparacion h2 {
@@ -74,10 +112,6 @@
                 margin-top: 24px;
                 padding-top: 20px;
                 border-top: 1px solid #d6c4d3;
-            }
-
-            .gestion-formulario[hidden] {
-                display: none;
             }
 
             .gestion-formulario h3 {
@@ -123,6 +157,21 @@
         document.head.append(estilo);
     }
 
+    function prepararTextos() {
+        document.getElementById("tituloGestion").textContent =
+            "Administrar joyas";
+
+        ui.panel.querySelector(".gestion-nota").textContent =
+            "Agrega joyas o consulta una por su identificador para editarla.";
+
+        ui.nueva.textContent = "Agregar joya";
+        ui.guardar.textContent = "Guardar joya";
+    }
+
+    function esAdmin() {
+        return usuario?.rol === "ADMIN";
+    }
+
     function mostrarMensaje(texto, tipo = "") {
         ui.mensaje.textContent = texto;
         ui.mensaje.className = tipo
@@ -136,132 +185,63 @@
         ui.mensaje.textContent = "";
     }
 
-    function cancelarConsulta() {
-        if (consultaActiva) {
-            consultaActiva.abort();
-            consultaActiva = null;
-        }
+    function establecerOcupado(activo) {
+        ocupado = activo;
 
-        ui.botonConsultar.disabled = false;
-        ui.botonConsultar.textContent = "Cargar para editar";
-        ui.consultar.setAttribute("aria-busy", "false");
-    }
-
-    function copiarCategorias() {
-        const seleccionAnterior = ui.categoria.value;
-
-        const opciones = [
-            new Option("Selecciona una categoría", "")
-        ];
-
-        for (const opcion of ui.categoriasCatalogo.options) {
-            if (opcion.value) {
-                opciones.push(
-                    new Option(opcion.textContent, opcion.value)
-                );
-            }
-        }
-
-        ui.categoria.replaceChildren(...opciones);
-
-        const existeSeleccion = opciones.some(
-            (opcion) => opcion.value === seleccionAnterior
-        );
-
-        ui.categoria.value = existeSeleccion
-            ? seleccionAnterior
-            : "";
-    }
-
-    function limpiarValidaciones() {
-        for (const campo of ui.formulario.querySelectorAll(
-            "input, select"
+        for (const control of ui.panel.querySelectorAll(
+            "button, input, select"
         )) {
-            campo.setCustomValidity("");
+            control.disabled = activo;
+        }
+
+        botonSalir.disabled = activo;
+        ui.panel.setAttribute("aria-busy", String(activo));
+    }
+
+    function actualizarSesion(datos) {
+        usuario = datos;
+        ui.panel.hidden = !esAdmin();
+
+        if (enlaceLogin) {
+            enlaceLogin.hidden = usuario !== null;
+        }
+
+        botonSalir.hidden = usuario === null;
+
+        estadoSesion.textContent = usuario
+            ? `${usuario.nombre || "Usuario"} · ${usuario.rol}`
+            : "";
+
+        if (!esAdmin()) {
+            ui.formulario.hidden = true;
+            idEdicion = null;
+            ui.formulario.reset();
         }
     }
 
-    function abrirNuevaJoya() {
-        cancelarConsulta();
-        ocultarMensaje();
-
-        idEdicion = null;
-
-        ui.formulario.reset();
-        limpiarValidaciones();
-        copiarCategorias();
-
-        ui.titulo.textContent = "Nueva joya";
-        ui.stock.value = "0";
-        ui.formulario.hidden = false;
-
-        ui.nombre.focus();
-    }
-
-    function cerrarFormulario() {
-        cancelarConsulta();
-        ocultarMensaje();
-
-        idEdicion = null;
-
-        ui.formulario.reset();
-        limpiarValidaciones();
-        ui.formulario.hidden = true;
-
-        ui.nueva.focus();
-    }
-
-    async function cargarParaEditar(evento) {
-        evento.preventDefault();
-
-        if (!ui.consultar.reportValidity()) {
-            return;
-        }
-
-        const id = Number(ui.idConsultar.value);
-
-        if (!Number.isSafeInteger(id) || id <= 0 ||
-            id > 2147483647) {
-            mostrarMensaje(
-                "Introduce un identificador entero válido.",
-                "error"
-            );
-            return;
-        }
-
-        cancelarConsulta();
-
+    async function solicitar(url, opciones = {}) {
         const controlador = new AbortController();
-        consultaActiva = controlador;
-
         let tiempoAgotado = false;
 
-        const tiempoLimite = setTimeout(() => {
+        const limite = setTimeout(() => {
             tiempoAgotado = true;
             controlador.abort();
         }, 15000);
 
-        // Oculta cualquier edición anterior durante la consulta.
-        idEdicion = null;
-        ui.formulario.hidden = true;
-        ui.botonConsultar.disabled = true;
-        ui.botonConsultar.textContent = "Consultando…";
-        ui.consultar.setAttribute("aria-busy", "true");
-
-        mostrarMensaje("Consultando la joya…");
-
         try {
-            const respuesta = await fetch(
-                `${apiJoyas.href.replace(/\/$/, "")}/${id}`,
-                {
-                    method: "GET",
-                    headers: {
-                        Accept: "application/json"
-                    },
-                    cache: "no-store",
-                    signal: controlador.signal
+            const respuesta = await fetch(url, {
+                ...opciones,
+                credentials: "same-origin",
+                cache: "no-store",
+                signal: controlador.signal,
+                headers: {
+                    Accept: "application/json",
+                    ...(opciones.body
+                        ? { "Content-Type": "application/json" }
+                        : {}),
+                    ...opciones.headers
                 }
-            );
+            });
 
             let cuerpo;
 
@@ -278,12 +258,152 @@
             }
 
             if (!respuesta.ok || cuerpo?.exito !== true) {
-                throw new Error(
+                const error = new Error(
                     typeof cuerpo?.mensaje === "string"
                         ? cuerpo.mensaje
-                        : `No se pudo consultar la joya (HTTP ${respuesta.status}).`
+                        : `La operación falló (HTTP ${respuesta.status}).`
+                );
+
+                error.status = respuesta.status;
+                throw error;
+            }
+
+            return cuerpo;
+        } catch (error) {
+            if (tiempoAgotado) {
+                throw new Error(
+                    opciones.method === "POST" ||
+                    opciones.method === "PUT"
+                        ? "No se recibió respuesta a tiempo. Actualiza el catálogo y comprueba si el cambio se guardó antes de repetirlo."
+                        : "La consulta tardó demasiado. Intenta nuevamente."
                 );
             }
+
+            if (error instanceof TypeError) {
+                throw new Error(
+                    "No se pudo conectar con el servidor. Si estabas guardando, revisa el catálogo antes de repetir la operación."
+                );
+            }
+
+            throw error;
+        } finally {
+            clearTimeout(limite);
+        }
+    }
+
+    async function consultarSesion() {
+        if (ocupado) {
+            return;
+        }
+
+        try {
+            const cuerpo = await solicitar(apiSesion);
+
+            if (!cuerpo.datos ||
+                typeof cuerpo.datos !== "object" ||
+                Array.isArray(cuerpo.datos) ||
+                typeof cuerpo.datos.rol !== "string") {
+                throw new Error("La respuesta de sesión no es válida.");
+            }
+
+            actualizarSesion(cuerpo.datos);
+        } catch (error) {
+            actualizarSesion(null);
+
+            if (error.status !== 401) {
+                estadoSesion.textContent =
+                    "No se pudo comprobar la sesión. Recarga para reintentar.";
+            }
+        }
+    }
+
+    function copiarCategorias() {
+        const opciones = [
+            new Option("Selecciona una categoría", "")
+        ];
+
+        for (const opcion of ui.categoriasCatalogo.options) {
+            if (opcion.value) {
+                opciones.push(
+                    new Option(opcion.textContent, opcion.value)
+                );
+            }
+        }
+
+        ui.categoria.replaceChildren(...opciones);
+    }
+
+    function limpiarValidaciones() {
+        for (const campo of ui.formulario.querySelectorAll(
+            "input, select"
+        )) {
+            campo.setCustomValidity("");
+        }
+    }
+
+    function abrirNuevaJoya() {
+        if (ocupado || !esAdmin()) {
+            return;
+        }
+
+        ocultarMensaje();
+        idEdicion = null;
+
+        ui.formulario.reset();
+        limpiarValidaciones();
+        copiarCategorias();
+
+        ui.titulo.textContent = "Nueva joya";
+        ui.stock.value = "0";
+        ui.guardar.textContent = "Crear joya";
+        ui.formulario.hidden = false;
+        ui.nombre.focus();
+    }
+
+    function cerrarFormulario() {
+        if (ocupado) {
+            return;
+        }
+
+        ocultarMensaje();
+        idEdicion = null;
+        ui.formulario.reset();
+        limpiarValidaciones();
+        ui.formulario.hidden = true;
+        ui.nueva.focus();
+    }
+
+    async function cargarParaEditar(evento) {
+        evento.preventDefault();
+
+        if (ocupado || !esAdmin() ||
+            !ui.consultar.reportValidity()) {
+            return;
+        }
+
+        const id = Number(ui.idConsultar.value);
+
+        if (!Number.isInteger(id) || id <= 0 ||
+            id > 2147483647) {
+            mostrarMensaje(
+                "Introduce un identificador entero válido.",
+                "error"
+            );
+            return;
+        }
+
+        idEdicion = null;
+        ui.formulario.hidden = true;
+        establecerOcupado(true);
+        ui.botonConsultar.textContent = "Consultando…";
+        mostrarMensaje("Consultando la joya…");
+
+        let cargada = false;
+
+        try {
+            const cuerpo = await solicitar(
+                `${apiJoyas.href.replace(/\/$/, "")}/${id}`
+            );
 
             const joya = cuerpo.datos;
 
@@ -294,27 +414,23 @@
                 );
             }
 
-            if (consultaActiva !== controlador) {
-                return;
-            }
-
             ui.formulario.reset();
             limpiarValidaciones();
             copiarCategorias();
 
             idEdicion = id;
-
             ui.titulo.textContent = `Editar joya #${id}`;
+            ui.guardar.textContent = "Guardar cambios";
+
             ui.nombre.value = joya.nombre ?? "";
             ui.material.value = joya.material ?? "";
             ui.precio.value = joya.precio ?? "";
             ui.stock.value = joya.stock ?? "";
 
             const categoria = joya.categoria;
-            const idCategoria = categoria?.idCategoria;
 
-            if (idCategoria != null) {
-                const valor = String(idCategoria);
+            if (categoria?.idCategoria != null) {
+                const valor = String(categoria.idCategoria);
 
                 const existe = [...ui.categoria.options].some(
                     (opcion) => opcion.value === valor
@@ -333,39 +449,21 @@
             }
 
             ui.formulario.hidden = false;
-
-            mostrarMensaje(
-                "Datos cargados. Puedes modificarlos y validarlos; todavía no se guardarán."
-            );
-
-            ui.nombre.focus();
+            mostrarMensaje("Datos cargados. Puedes editarlos.");
+            cargada = true;
         } catch (error) {
-            if (consultaActiva !== controlador) {
-                return;
-            }
-
-            const mensaje = tiempoAgotado
-                ? "La consulta tardó demasiado. Intenta nuevamente."
-                : error instanceof TypeError
-                    ? "No se pudo conectar con el servidor. Comprueba que Tomcat esté iniciado."
-                    : error.message || "No se pudo consultar la joya.";
-
-            mostrarMensaje(mensaje, "error");
+            mostrarMensaje(error.message, "error");
         } finally {
-            clearTimeout(tiempoLimite);
+            establecerOcupado(false);
+            ui.botonConsultar.textContent = "Cargar para editar";
 
-            if (consultaActiva === controlador) {
-                consultaActiva = null;
-                ui.botonConsultar.disabled = false;
-                ui.botonConsultar.textContent = "Cargar para editar";
-                ui.consultar.setAttribute("aria-busy", "false");
+            if (cargada) {
+                ui.nombre.focus();
             }
         }
     }
 
-    function validarFormulario(evento) {
-        evento.preventDefault();
-
+    function obtenerDatosValidos() {
         limpiarValidaciones();
 
         const nombre = ui.nombre.value.trim();
@@ -374,67 +472,151 @@
         const stock = Number(ui.stock.value);
         const idCategoria = Number(ui.categoria.value);
 
-        if (!nombre) {
+        if (!nombre || nombre.length > 100) {
             ui.nombre.setCustomValidity(
-                "Escribe el nombre de la joya."
+                "Escribe un nombre de hasta 100 caracteres."
             );
         }
 
-        if (!material) {
+        if (!material || material.length > 50) {
             ui.material.setCustomValidity(
-                "Escribe el material de la joya."
+                "Escribe un material de hasta 50 caracteres."
             );
         }
 
-        if (!ui.precio.value ||
-            !Number.isFinite(precio) || precio <= 0) {
+        if (!ui.precio.value || !Number.isFinite(precio) ||
+            precio <= 0 || precio > 99999999.99) {
             ui.precio.setCustomValidity(
-                "El precio debe ser mayor que cero."
+                "Introduce un precio válido mayor que cero."
             );
         }
 
-        if (!ui.stock.value ||
-            !Number.isInteger(stock) || stock < 0) {
+        if (!ui.stock.value || !Number.isInteger(stock) ||
+            stock < 0 || stock > 2147483647) {
             ui.stock.setCustomValidity(
-                "El stock debe ser un número entero sin negativos."
+                "El stock debe ser un entero sin negativos."
             );
         }
 
-        if (!Number.isInteger(idCategoria) || idCategoria <= 0) {
+        if (!Number.isInteger(idCategoria) ||
+            idCategoria <= 0 || idCategoria > 2147483647) {
             ui.categoria.setCustomValidity(
-                "Selecciona una categoría."
+                "Selecciona una categoría válida."
             );
         }
 
         if (!ui.formulario.reportValidity()) {
+            return null;
+        }
+
+        return {
+            nombre,
+            material,
+            precio,
+            stock,
+            idCategoria
+        };
+    }
+
+    async function guardarJoya(evento) {
+        evento.preventDefault();
+
+        if (ocupado || !esAdmin()) {
+            return;
+        }
+
+        const datos = obtenerDatosValidos();
+
+        if (!datos) {
             mostrarMensaje(
-                "Revisa los campos señalados del formulario.",
+                "Revisa los campos señalados.",
                 "error"
             );
             return;
         }
 
-        ui.nombre.value = nombre;
-        ui.material.value = material;
+        const editando = idEdicion !== null;
 
-        const operacion = idEdicion === null
-            ? "la nueva joya"
-            : `la joya #${idEdicion}`;
+        const url = editando
+            ? `${apiJoyas.href.replace(/\/$/, "")}/${idEdicion}`
+            : apiJoyas;
 
-        mostrarMensaje(
-            `Los datos de ${operacion} cumplen las validaciones del formulario. No se enviaron ni se guardaron cambios.`
-        );
+        const textoBoton = ui.guardar.textContent;
 
-        // Aquí conectaremos POST o PUT cuando esté listo
-        // el contrato definitivo y la autenticación de la API.
+        establecerOcupado(true);
+        ui.guardar.textContent = "Guardando…";
+        mostrarMensaje("Guardando la joya…");
+
+        try {
+            const cuerpo = await solicitar(url, {
+                method: editando ? "PUT" : "POST",
+                body: JSON.stringify(datos)
+            });
+
+            idEdicion = null;
+            ui.formulario.reset();
+            ui.formulario.hidden = true;
+
+            mostrarMensaje(
+                cuerpo.mensaje || "Joya guardada correctamente.",
+                "exito"
+            );
+
+            // Reutiliza la actualización del catálogo de app.js.
+            if (!ui.recargar.disabled) {
+                ui.recargar.click();
+            }
+        } catch (error) {
+            if (error.status === 401 || error.status === 403) {
+                await actualizarTrasRechazo(error);
+            } else {
+                mostrarMensaje(error.message, "error");
+            }
+        } finally {
+            establecerOcupado(false);
+            ui.guardar.textContent = textoBoton;
+        }
+    }
+
+    async function actualizarTrasRechazo(error) {
+        actualizarSesion(null);
+
+        // Mensaje fuera de la sección que acabamos de ocultar.
+        estadoSesion.textContent = error.status === 401
+            ? "La sesión terminó. Inicia sesión nuevamente."
+            : "No tienes permisos de administrador. Inicia sesión con una cuenta autorizada.";
+    }
+
+    async function cerrarSesion() {
+        if (ocupado) {
+            return;
+        }
+
+        establecerOcupado(true);
+        botonSalir.textContent = "Cerrando…";
+
+        try {
+            await solicitar(apiLogout, {
+                method: "POST"
+            });
+
+            actualizarSesion(null);
+            estadoSesion.textContent = "Sesión cerrada.";
+        } catch (error) {
+            estadoSesion.textContent =
+                `No se pudo confirmar el cierre: ${error.message}`;
+        } finally {
+            establecerOcupado(false);
+            botonSalir.textContent = "Cerrar sesión";
+        }
     }
 
     ui.nueva.addEventListener("click", abrirNuevaJoya);
     ui.cancelar.addEventListener("click", cerrarFormulario);
     ui.consultar.addEventListener("submit", cargarParaEditar);
-    ui.formulario.addEventListener("submit", validarFormulario);
+    ui.formulario.addEventListener("submit", guardarJoya);
+    botonSalir.addEventListener("click", cerrarSesion);
 
-    // Permite corregir un campo después de una validación fallida.
     ui.formulario.addEventListener("input", (evento) => {
         if (typeof evento.target.setCustomValidity === "function") {
             evento.target.setCustomValidity("");
@@ -442,4 +624,9 @@
 
         ocultarMensaje();
     });
+
+    // Revisa la sesión al volver desde otra pestaña.
+    window.addEventListener("focus", consultarSesion);
+
+    consultarSesion();
 })();

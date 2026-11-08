@@ -7,10 +7,12 @@
     <title>Catálogo | Lila Joyería</title>
 
     <link rel="stylesheet" href="styles.css?v=4">
+
     <script src="app.js" defer></script>
-    <script src="gestion.js" defer></script>
+    <script src="gestion.js?v=2" defer></script>
 </head>
 <body>
+
 <header class="cabecera">
     <div class="contenedor cabecera-contenido">
         <a class="marca" href="./index.html">
@@ -32,6 +34,7 @@
 </header>
 
 <main class="contenedor">
+
     <section class="presentacion" aria-labelledby="titulo">
         <p class="subtitulo">Nuestra colección</p>
 
@@ -70,6 +73,7 @@
                         name="soloDisponibles"
                         type="checkbox"
                 >
+
                 Solo disponibles
             </label>
 
@@ -77,15 +81,29 @@
                 Limpiar
             </button>
 
-            <button id="btnRecargar" type="button" class="boton">
+            <button
+                    id="btnRecargar"
+                    type="button"
+                    class="boton"
+            >
                 Actualizar catálogo
             </button>
         </form>
     </section>
 
-    <div id="mensaje" class="mensaje" role="alert" hidden></div>
+    <div
+            id="mensaje"
+            class="mensaje"
+            role="alert"
+            hidden
+    ></div>
 
-    <div id="estadoCarga" class="estado-carga" role="status" hidden>
+    <div
+            id="estadoCarga"
+            class="estado-carga"
+            role="status"
+            hidden
+    >
         <span class="spinner" aria-hidden="true"></span>
         <span>Cargando joyas…</span>
     </div>
@@ -115,17 +133,21 @@
     <section
             class="panel-filtros gestion-preparacion"
             aria-labelledby="tituloGestion"
+            hidden
     >
-        <h2 id="tituloGestion">Preparación del formulario de joyas</h2>
+        <h2 id="tituloGestion">Administrar joyas</h2>
 
         <p class="gestion-nota">
-            Modo de prueba: permite consultar y validar datos.
-            Los cambios todavía no se guardan.
+            Agrega joyas o consulta una por su identificador para editarla.
         </p>
 
         <div class="gestion-acciones">
-            <button id="btnNuevaJoya" type="button" class="boton">
-                Preparar nueva joya
+            <button
+                    id="btnNuevaJoya"
+                    type="button"
+                    class="boton"
+            >
+                Agregar joya
             </button>
         </div>
 
@@ -137,6 +159,7 @@
 
                 <input
                         id="idConsultarJoya"
+                        name="idConsultarJoya"
                         type="number"
                         min="1"
                         max="2147483647"
@@ -145,7 +168,11 @@
                 >
             </div>
 
-            <button id="btnConsultarEdicion" type="submit" class="boton">
+            <button
+                    id="btnConsultarEdicion"
+                    type="submit"
+                    class="boton"
+            >
                 Cargar para editar
             </button>
         </form>
@@ -163,8 +190,10 @@
 
             <div class="campo">
                 <label for="nombreJoya">Nombre</label>
+
                 <input
                         id="nombreJoya"
+                        name="nombre"
                         type="text"
                         maxlength="100"
                         required
@@ -173,8 +202,10 @@
 
             <div class="campo">
                 <label for="materialJoya">Material</label>
+
                 <input
                         id="materialJoya"
+                        name="material"
                         type="text"
                         maxlength="50"
                         required
@@ -184,8 +215,10 @@
             <div class="gestion-columnas">
                 <div class="campo">
                     <label for="precioJoya">Precio en dólares</label>
+
                     <input
                             id="precioJoya"
+                            name="precio"
                             type="number"
                             min="0.01"
                             max="99999999.99"
@@ -196,12 +229,15 @@
 
                 <div class="campo">
                     <label for="stockJoya">Stock</label>
+
                     <input
                             id="stockJoya"
+                            name="stock"
                             type="number"
                             min="0"
                             max="2147483647"
                             step="1"
+                            value="0"
                             required
                     >
                 </div>
@@ -209,18 +245,24 @@
 
             <div class="campo">
                 <label for="categoriaJoya">Categoría</label>
-                <select id="categoriaJoya" required>
+
+                <select
+                        id="categoriaJoya"
+                        name="idCategoria"
+                        aria-describedby="ayudaCategoriaJoya"
+                        required
+                >
                     <option value="">Selecciona una categoría</option>
                 </select>
 
-                <small>
+                <small id="ayudaCategoriaJoya">
                     Se muestran las categorías presentes en el catálogo.
                 </small>
             </div>
 
             <div class="gestion-acciones">
                 <button type="submit" class="boton">
-                    Validar datos
+                    Guardar joya
                 </button>
 
                 <button
@@ -233,10 +275,12 @@
             </div>
         </form>
     </section>
+
 </main>
 
 <footer class="pie">
     <p>Lila Joyería · Diseños para cada ocasión</p>
 </footer>
+
 </body>
 </html>
