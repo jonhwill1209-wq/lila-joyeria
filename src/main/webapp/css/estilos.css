@@ -241,6 +241,106 @@ footer {
     color: #665264;
 }
 
+.nosotros-seccion {
+    padding: 70px 0;
+    background: #EFE0EC;
+}
+
+.nosotros-contenido {
+    max-width: 760px;
+    text-align: center;
+}
+
+.nosotros-contenido h2 {
+    margin-bottom: 18px;
+    font-size: 32px;
+}
+
+.nosotros-contenido p:not(.nosotros-etiqueta) {
+    margin: 0 auto 16px;
+    color: #665264;
+    font-size: 17px;
+    line-height: 1.7;
+}
+
+.nosotros-etiqueta {
+    margin-bottom: 10px;
+    color: #8B5C83;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.nosotros-contenido .boton {
+    display: inline-block;
+    margin-top: 8px;
+}
+
+.feedback-carrito {
+    margin: 0 0 20px;
+    padding: 14px 18px;
+    border-radius: 6px;
+    font-weight: 700;
+    text-align: center;
+    animation: carrito-feedback-entrada 420ms ease-out both;
+}
+
+.feedback-carrito-exito {
+    border: 1px solid #A8CEB1;
+    background: #E2F0E5;
+    color: #2D5837;
+}
+
+.feedback-carrito-error {
+    border: 1px solid #D9AEB4;
+    background: #F7E5E7;
+    color: #79343E;
+}
+
+@keyframes carrito-feedback-entrada {
+    from {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.producto-agregado {
+    animation: producto-agregado 700ms ease-out;
+}
+
+@keyframes producto-agregado {
+    0% {
+        box-shadow: 0 4px 15px rgba(74, 37, 69, 0.08);
+        transform: scale(1);
+    }
+    35% {
+        box-shadow: 0 0 0 5px rgba(91, 135, 101, 0.2),
+                    0 10px 24px rgba(74, 37, 69, 0.16);
+        transform: scale(1.025);
+    }
+    100% {
+        box-shadow: 0 4px 15px rgba(74, 37, 69, 0.08);
+        transform: scale(1);
+    }
+}
+
+.boton-carrito-agregado {
+    background-color: #3F7650;
+    border-color: #3F7650;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .feedback-carrito,
+    .producto-agregado {
+        animation: none;
+    }
+}
+
 /* --- MENSAJES (ERROR, EXITO, INFO) --- */
 .mensaje-exito {
     background-color: #E2F0E5;
@@ -324,6 +424,7 @@ footer {
 .resumen-carrito {
     margin-top: 30px;
     display: flex;
+    flex-wrap: wrap;
     justify-content: flex-end;
     align-items: center;
     gap: 25px;
@@ -331,6 +432,29 @@ footer {
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 4px 15px rgba(74, 37, 69, 0.08);
+}
+
+.datos-entrega {
+    flex: 1 0 100%;
+}
+
+.datos-entrega h3 {
+    margin-bottom: 8px;
+}
+
+.datos-entrega > p,
+.datos-entrega small {
+    color: #665264;
+}
+
+.datos-entrega .grupo-formulario {
+    max-width: 640px;
+    margin: 14px 0;
+}
+
+.datos-entrega input,
+.datos-entrega textarea {
+    width: 100%;
 }
 
 .resumen-carrito h3 {

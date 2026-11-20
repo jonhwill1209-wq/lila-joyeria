@@ -95,6 +95,16 @@
 
                 <h:form id="formProductos">
 
+                    <h:panelGroup id="feedbackCarrito" layout="block">
+                        <h:panelGroup layout="block"
+                                      rendered="#{not empty carritoBean.mensajeFeedback}"
+                                      styleClass="#{carritoBean.feedbackExitoso ? 'feedback-carrito feedback-carrito-exito' : 'feedback-carrito feedback-carrito-error'}"
+                                      pt:role="status"
+                                      pt:aria-live="polite">
+                            <h:outputText value="#{carritoBean.mensajeFeedback}" />
+                        </h:panelGroup>
+                    </h:panelGroup>
+
                     <h:panelGroup id="productos"
                                   layout="block"
                                   styleClass="lista-productos">
@@ -102,7 +112,7 @@
                         <ui:repeat value="#{catalogoBean.joyas}"
                                    var="joya">
 
-                            <article class="producto">
+                            <article class="#{carritoBean.feedbackExitoso and carritoBean.idJoyaFeedback == joya.idJoya ? 'producto producto-agregado' : 'producto'}">
 
                                 <h:graphicImage value="/img/productos/#{joya.imagen}"
                                                 alt="#{joya.nombre}"
@@ -153,13 +163,13 @@
                                     unidades
                                 </p>
 
-                                <h:commandButton value="Agregar al carrito"
+                                <h:commandButton value="#{carritoBean.feedbackExitoso and carritoBean.idJoyaFeedback == joya.idJoya ? '✓ Agregado' : 'Agregar al carrito'}"
                                                  action="#{carritoBean.agregar(joya)}"
-                                                 styleClass="boton-carrito"
+                                                 styleClass="#{carritoBean.feedbackExitoso and carritoBean.idJoyaFeedback == joya.idJoya ? 'boton-carrito boton-carrito-agregado' : 'boton-carrito'}"
                                                  rendered="#{joya.stock gt 0 and not authBean.admin}">
 
                                     <f:ajax execute="@this"
-                                            render=":mensajes :formProductos:resumenCarrito" />
+                                            render=":mensajes :formProductos:feedbackCarrito :formProductos:productos :formProductos:resumenCarrito" />
                                 </h:commandButton>
 
                                 <h:panelGroup rendered="#{joya.stock le 0}">

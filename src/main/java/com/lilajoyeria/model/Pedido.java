@@ -20,6 +20,12 @@ public class Pedido implements java.io.Serializable {
     private LocalDateTime fechaPedido;
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal total;
+    @Column(name = "nombre_contacto", nullable = false, length = 100)
+    private String nombreContacto;
+    @Column(name = "direccion_entrega", nullable = false, length = 255)
+    private String direccionEntrega;
+    @Column(name = "telefono_whatsapp", nullable = false, length = 30)
+    private String telefonoWhatsapp;
     @Enumerated(EnumType.STRING) @Column(length = 9)
     private EstadoPedido estado;
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true) @OrderBy("idDetalle ASC")
@@ -98,6 +104,51 @@ public class Pedido implements java.io.Serializable {
             );
         }
         this.total = total;
+    }
+
+    public String getNombreContacto() {
+        return nombreContacto;
+    }
+
+    public void setNombreContacto(String nombreContacto) {
+        this.nombreContacto = validarTextoEntrega(
+                nombreContacto, "El nombre de contacto", 100
+        );
+    }
+
+    public String getDireccionEntrega() {
+        return direccionEntrega;
+    }
+
+    public void setDireccionEntrega(String direccionEntrega) {
+        this.direccionEntrega = validarTextoEntrega(
+                direccionEntrega, "La dirección de entrega", 255
+        );
+    }
+
+    public String getTelefonoWhatsapp() {
+        return telefonoWhatsapp;
+    }
+
+    public void setTelefonoWhatsapp(String telefonoWhatsapp) {
+        this.telefonoWhatsapp = validarTextoEntrega(
+                telefonoWhatsapp, "El teléfono de WhatsApp", 30
+        );
+    }
+
+    private static String validarTextoEntrega(
+            String valor, String campo, int longitudMaxima) {
+        if (valor == null || valor.trim().isEmpty()) {
+            throw new IllegalArgumentException(campo + " es obligatorio");
+        }
+        String limpio = valor.trim();
+        if (limpio.length() > longitudMaxima) {
+            throw new IllegalArgumentException(
+                    campo + " no puede superar " + longitudMaxima
+                            + " caracteres"
+            );
+        }
+        return limpio;
     }
 
     public EstadoPedido getEstado() {

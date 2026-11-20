@@ -29,10 +29,16 @@ public class PedidoBean implements Serializable {
     private CarritoBean carritoBean;
 
     private transient PedidoDAO pedidoDAO;
+    private String nombreContacto;
+    private String direccionEntrega;
+    private String telefonoWhatsapp;
 
     @PostConstruct
     public void iniciar() {
         pedidoDAO = new PedidoDAO();
+        if (authBean.getUsuarioActual() != null) {
+            nombreContacto = authBean.getUsuarioActual().getNombre();
+        }
     }
 
     private PedidoDAO obtenerPedidoDAO() {
@@ -56,8 +62,17 @@ public class PedidoBean implements Serializable {
             return null;
         }
 
+        String errorEntrega = validarDatosEntrega();
+        if (errorEntrega != null) {
+            mostrarError(errorEntrega);
+            return null;
+        }
+
         try {
             carrito.setUsuario(authBean.getUsuarioActual());
+            carrito.setNombreContacto(nombreContacto);
+            carrito.setDireccionEntrega(direccionEntrega);
+            carrito.setTelefonoWhatsapp(telefonoWhatsapp);
             carrito.calcularTotal();
 
             obtenerPedidoDAO().guardar(carrito);
@@ -111,5 +126,52 @@ public class PedidoBean implements Serializable {
                         mensaje
                 )
         );
+    }
+
+    private String validarDatosEntrega() {
+        if (nombreContacto == null || nombreContacto.trim().isEmpty()
+                || direccionEntrega == null
+                || direccionEntrega.trim().isEmpty()
+                || telefonoWhatsapp == null
+                || telefonoWhatsapp.trim().isEmpty()) {
+            return "Completa el nombre, la dirección y el teléfono de WhatsApp.";
+        }
+        if (nombreContacto.trim().length() > 100) {
+            return "El nombre no puede superar 100 caracteres.";
+        }
+        if (direccionEntrega.trim().length() > 255) {
+            return "La dirección no puede superar 255 caracteres.";
+        }
+        String numeros = telefonoWhatsapp.replaceAll("\\D", "");
+        if (telefonoWhatsapp.trim().length() > 30
+                || !telefonoWhatsapp.trim().matches("[+0-9() .-]{7,30}")
+                || numeros.length() < 7 || numeros.length() > 15) {
+            return "Ingresa un teléfono de WhatsApp válido (de 7 a 15 dígitos).";
+        }
+        return null;
+    }
+
+    public String getNombreContacto() {
+        return nombreContacto;
+    }
+
+    public void setNombreContacto(String nombreContacto) {
+        this.nombreContacto = nombreContacto;
+    }
+
+    public String getDireccionEntrega() {
+        return direccionEntrega;
+    }
+
+    public void setDireccionEntrega(String direccionEntrega) {
+        this.direccionEntrega = direccionEntrega;
+    }
+
+    public String getTelefonoWhatsapp() {
+        return telefonoWhatsapp;
+    }
+
+    public void setTelefonoWhatsapp(String telefonoWhatsapp) {
+        this.telefonoWhatsapp = telefonoWhatsapp;
     }
 }

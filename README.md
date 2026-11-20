@@ -45,6 +45,8 @@ git clone [https://github.com/jonhwill1209-wq/lila-joyeria.git](https://github.c
 1. Abre MySQL Workbench.
 2. Ejecuta el script SQL ubicado en `recursos_db/lila_joyeria_schema.sql`.
    *(Este script creará la base de datos `lila_joyeria`, las tablas correspondientes y registros base).*
+3. Si la base de datos ya existía antes de los datos de entrega en pedidos,
+   ejecuta una vez `recursos_db/migracion_datos_entrega_pedido.sql`.
 
 ### 3. Configuración de Credenciales
 1. Ve a la ruta `src/main/resources/database.properties`.

@@ -4,6 +4,7 @@
         xmlns:h="jakarta.faces.html"
         xmlns:f="jakarta.faces.core"
         xmlns:ui="jakarta.faces.facelets"
+        xmlns:pt="jakarta.faces.passthrough"
         template="/WEB-INF/templates/plantilla.xhtml">
 
     <ui:define name="titulo">Carrito</ui:define>
@@ -111,6 +112,47 @@
                         <h:panelGroup layout="block"
                                       styleClass="resumen-carrito"
                                       rendered="#{not empty carritoBean.carrito.detalles}">
+
+                            <h:panelGroup layout="block"
+                                          styleClass="datos-entrega"
+                                          rendered="#{authBean.autenticado}">
+                                <h3>Datos para la entrega</h3>
+                                <p>Indica a quién y dónde entregamos tu pedido.</p>
+
+                                <div class="grupo-formulario">
+                                    <h:outputLabel for="nombreContacto"
+                                                   value="Nombre de quien recibe" />
+                                    <h:inputText id="nombreContacto"
+                                                 value="#{pedidoBean.nombreContacto}"
+                                                 required="true"
+                                                 requiredMessage="El nombre de quien recibe es obligatorio."
+                                                 maxlength="100" />
+                                </div>
+
+                                <div class="grupo-formulario">
+                                    <h:outputLabel for="direccionEntrega"
+                                                   value="Dirección de entrega" />
+                                    <h:inputTextarea id="direccionEntrega"
+                                                     value="#{pedidoBean.direccionEntrega}"
+                                                     required="true"
+                                                     requiredMessage="La dirección de entrega es obligatoria."
+                                                     maxlength="255"
+                                                     rows="3" />
+                                </div>
+
+                                <div class="grupo-formulario">
+                                    <h:outputLabel for="telefonoWhatsapp"
+                                                   value="Teléfono de WhatsApp" />
+                                    <h:inputText id="telefonoWhatsapp"
+                                                 value="#{pedidoBean.telefonoWhatsapp}"
+                                                 required="true"
+                                                 requiredMessage="El teléfono de WhatsApp es obligatorio."
+                                                 maxlength="30"
+                                                 pt:type="tel"
+                                                 pt:placeholder="+503 7000-0000" />
+                                    <small>Incluye el código de país; escribe entre 7 y 15 dígitos.</small>
+                                </div>
+                            </h:panelGroup>
 
                             <h3>
                                 Total:

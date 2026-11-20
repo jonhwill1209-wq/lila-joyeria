@@ -72,6 +72,9 @@ VALUES
 CREATE TABLE pedidos (
                          id_pedido INT AUTO_INCREMENT PRIMARY KEY,
                          id_usuario INT NOT NULL,
+                         nombre_contacto VARCHAR(100) NOT NULL,
+                         direccion_entrega VARCHAR(255) NOT NULL,
+                         telefono_whatsapp VARCHAR(30) NOT NULL,
                          fecha_pedido TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                          total DECIMAL(10,2) NOT NULL,
                          estado ENUM('PENDIENTE', 'PAGADO', 'ENVIADO') DEFAULT 'PENDIENTE',

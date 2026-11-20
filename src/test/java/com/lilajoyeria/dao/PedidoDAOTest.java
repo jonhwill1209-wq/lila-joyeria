@@ -84,6 +84,9 @@ public class PedidoDAOTest {
             Pedido pedido = new Pedido();
 
             pedido.setUsuario(usuario);
+            pedido.setNombreContacto(usuario.getNombre());
+            pedido.setDireccionEntrega("Calle de prueba 123");
+            pedido.setTelefonoWhatsapp("+503 7000-0000");
 
             DetallePedido detalle =
                     new DetallePedido(

@@ -129,7 +129,7 @@ public class JoyaAdminBean implements Serializable {
         FacesUtil.reiniciarEntradas("formEdicion");
     }
 
-    public void guardar() {
+    public String guardar() {
         try {
             Categoria categoria = idCategoria == null
                     ? null
@@ -151,14 +151,15 @@ public class JoyaAdminBean implements Serializable {
                 if (!dao.actualizar(joya)) {
                     FacesUtil.error("La joya ya no existe.");
                     cargar();
-                    return;
+                    return null;
                 }
                 FacesUtil.info("Joya actualizada correctamente.");
             }
 
             formularioVisible = false;
             vaciarFormulario();
-            cargar();
+            FacesUtil.mantenerMensajes();
+            return "/admin/joyas?faces-redirect=true";
 
         } catch (IllegalArgumentException e) {
             // Validaciones del modelo Joya (precio negativo, nombre vacío...).
@@ -166,6 +167,8 @@ public class JoyaAdminBean implements Serializable {
         } catch (SQLException e) {
             FacesUtil.error("No fue posible guardar la joya.");
         }
+
+        return null;
     }
 
     // ------------------------------------------------------------- eliminación

@@ -48,6 +48,9 @@ class PersistenciaJPATest {
     private Pedido pedido(Usuario u, Joya j) {
         Pedido p = new Pedido();
         p.setUsuario(u);
+        p.setNombreContacto(u.getNombre());
+        p.setDireccionEntrega("Calle de prueba 123");
+        p.setTelefonoWhatsapp("+503 7000-0000");
         p.agregarDetalle(new DetallePedido(p, j, 2, j.getPrecio()));
         return p;
     }
@@ -85,6 +88,9 @@ class PersistenciaJPATest {
         pedidos.guardar(p);
         Pedido recuperado = pedidos.buscarPorId(p.getIdPedido());
         assertEquals("Cliente", recuperado.getUsuario().getNombre());
+        assertEquals("Cliente", recuperado.getNombreContacto());
+        assertEquals("Calle de prueba 123", recuperado.getDireccionEntrega());
+        assertEquals("+503 7000-0000", recuperado.getTelefonoWhatsapp());
         assertEquals("Anillos", recuperado.getDetalles().get(0).getJoya().getCategoria().getNombre());
         assertEquals(0, new BigDecimal("150.00").compareTo(recuperado.getTotal()));
         assertEquals(1, pedidos.listarPorUsuario(p.getUsuario().getIdUsuario()).size());

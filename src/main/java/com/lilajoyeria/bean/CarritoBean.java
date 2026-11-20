@@ -24,6 +24,9 @@ public class CarritoBean implements Serializable {
 
     // Cantidades propuestas en el formulario.
     private final Map<Integer, Integer> cantidades = new HashMap<>();
+    private String mensajeFeedback;
+    private boolean feedbackExitoso;
+    private Integer idJoyaFeedback;
 
     @PostConstruct
     public void iniciar() {
@@ -35,13 +38,16 @@ public class CarritoBean implements Serializable {
     }
 
     public void agregar(Joya joya, int cantidad) {
+        mensajeFeedback = null;
+        idJoyaFeedback = null;
+
         if (joya == null) {
-            mostrarError("Selecciona un producto válido.");
+            mostrarFeedback("Selecciona un producto válido.", false);
             return;
         }
 
         if (cantidad <= 0) {
-            mostrarError("La cantidad debe ser mayor que cero.");
+            mostrarFeedback("La cantidad debe ser mayor que cero.", false);
             return;
         }
 
@@ -55,7 +61,7 @@ public class CarritoBean implements Serializable {
         long nuevaCantidad = (long) cantidadActual + cantidad;
 
         if (nuevaCantidad > joya.getStock()) {
-            mostrarError("No hay suficiente inventario disponible.");
+            mostrarFeedback("No hay suficiente inventario disponible.", false);
             return;
         }
 
@@ -72,7 +78,12 @@ public class CarritoBean implements Serializable {
 
         cantidades.put(joya.getIdJoya(), (int) nuevaCantidad);
         carrito.calcularTotal();
-        mostrarExito("Producto agregado al carrito.");
+        idJoyaFeedback = joya.getIdJoya();
+        mostrarFeedback(
+                joya.getNombre() + " agregado al carrito. Cantidad: "
+                        + nuevaCantidad + ".",
+                true
+        );
     }
 
     public void actualizarCantidad(DetallePedido detalle) {
@@ -135,6 +146,18 @@ public class CarritoBean implements Serializable {
         return carrito.getTotal();
     }
 
+    public String getMensajeFeedback() {
+        return mensajeFeedback;
+    }
+
+    public boolean isFeedbackExitoso() {
+        return feedbackExitoso;
+    }
+
+    public Integer getIdJoyaFeedback() {
+        return idJoyaFeedback;
+    }
+
     public Map<Integer, Integer> getCantidades() {
         for (DetallePedido detalle : carrito.getDetalles()) {
             cantidades.putIfAbsent(
@@ -176,5 +199,10 @@ public class CarritoBean implements Serializable {
                         mensaje
                 )
         );
+    }
+
+    private void mostrarFeedback(String mensaje, boolean exitoso) {
+        mensajeFeedback = mensaje;
+        feedbackExitoso = exitoso;
     }
 }
