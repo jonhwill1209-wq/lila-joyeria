@@ -41,6 +41,7 @@ public class UsuarioAdminBean implements Serializable {
     private int idUsuario;
     private String nombre;
     private String correo;
+    private String password;
     private RolUsuario rol;
 
     @PostConstruct
@@ -80,6 +81,7 @@ public class UsuarioAdminBean implements Serializable {
         idUsuario = usuario.getIdUsuario();
         nombre = usuario.getNombre();
         correo = usuario.getEmail();
+        password = null;
         rol = usuario.getRol();
 
         formularioVisible = true;
@@ -88,6 +90,7 @@ public class UsuarioAdminBean implements Serializable {
 
     public void cancelar() {
         formularioVisible = false;
+        password = null;
         FacesUtil.reiniciarEntradas("formEdicion");
     }
 
@@ -112,12 +115,16 @@ public class UsuarioAdminBean implements Serializable {
             usuario.setNombre(nombre);
             usuario.setEmail(correo);
             usuario.setRol(rol);
+            if (password != null && !password.isEmpty()) {
+                usuario.setPassword(password);
+            }
 
             dao.actualizar(usuario);
             authBean.refrescarUsuario(usuario);
 
             FacesUtil.info("Usuario actualizado correctamente.");
             formularioVisible = false;
+            password = null;
             cargar();
 
         } catch (IllegalArgumentException e) {
@@ -204,6 +211,14 @@ public class UsuarioAdminBean implements Serializable {
 
     public void setCorreo(String correo) {
         this.correo = correo;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public RolUsuario getRol() {

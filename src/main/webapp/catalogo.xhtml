@@ -7,6 +7,13 @@
         xmlns:pt="jakarta.faces.passthrough"
         template="/WEB-INF/templates/plantilla.xhtml">
 
+    <f:metadata>
+        <f:viewParam name="categoria"
+                     value="#{catalogoBean.categoriaInicial}" />
+        <f:viewAction action="#{catalogoBean.aplicarCategoriaInicial}"
+                      onPostback="false" />
+    </f:metadata>
+
     <ui:define name="titulo">Catálogo</ui:define>
 
     <ui:define name="contenido">

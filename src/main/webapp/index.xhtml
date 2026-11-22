@@ -2,6 +2,7 @@
 <ui:composition
         xmlns="http://www.w3.org/1999/xhtml"
         xmlns:h="jakarta.faces.html"
+        xmlns:f="jakarta.faces.core"
         xmlns:ui="jakarta.faces.facelets"
         template="/WEB-INF/templates/plantilla.xhtml">
 
@@ -32,7 +33,9 @@
 
                 <div class="accordion-gallery" id="joyas-accordion">
 
-                    <div class="ag-panel" tabindex="0">
+                    <h:link outcome="/catalogo"
+                            styleClass="ag-panel">
+                        <f:param name="categoria" value="Anillos" />
                         <span class="ag-panel__frame">
                             <span class="ag-panel__media">
                                 <h:graphicImage value="/img/anillo1.jpeg" alt="Anillos" />
@@ -43,9 +46,11 @@
                             <span class="ag-panel__bar"></span>
                             <span class="ag-panel__text">Anillos de Compromiso</span>
                         </span>
-                    </div>
+                    </h:link>
 
-                    <div class="ag-panel" tabindex="0">
+                    <h:link outcome="/catalogo"
+                            styleClass="ag-panel">
+                        <f:param name="categoria" value="Collares" />
                         <span class="ag-panel__frame">
                             <span class="ag-panel__media">
                                 <h:graphicImage value="/img/collar1.jpeg" alt="Collares" />
@@ -56,9 +61,11 @@
                             <span class="ag-panel__bar"></span>
                             <span class="ag-panel__text">Collares Elegantes</span>
                         </span>
-                    </div>
+                    </h:link>
 
-                    <div class="ag-panel ag-panel--active" tabindex="0">
+                    <h:link outcome="/catalogo"
+                            styleClass="ag-panel ag-panel--active">
+                        <f:param name="categoria" value="Aretes" />
                         <span class="ag-panel__frame">
                             <span class="ag-panel__media">
                                 <h:graphicImage value="/img/arete1.jpeg" alt="Aretes" />
@@ -67,11 +74,13 @@
                         </span>
                         <span class="ag-panel__label">
                             <span class="ag-panel__bar"></span>
-                            <span class="ag-panel__text">Aretes de Diamante</span>
+                            <span class="ag-panel__text">Aretes de Plata</span>
                         </span>
-                    </div>
+                    </h:link>
 
-                    <div class="ag-panel" tabindex="0">
+                    <h:link outcome="/catalogo"
+                            styleClass="ag-panel">
+                        <f:param name="categoria" value="Pulseras" />
                         <span class="ag-panel__frame">
                             <span class="ag-panel__media">
                                 <h:graphicImage value="/img/pulsera1.jpeg" alt="Brazaletes" />
@@ -82,7 +91,7 @@
                             <span class="ag-panel__bar"></span>
                             <span class="ag-panel__text">Brazaletes de Lujo</span>
                         </span>
-                    </div>
+                    </h:link>
 
                 </div>
             </div>
@@ -101,8 +110,6 @@
                     Queremos que encuentres una pieza que se sienta tuya:
                     especial, versátil y elegida con cariño.
                 </p>
-                <h:link outcome="catalogo" value="Descubre la colección"
-                        styleClass="boton" />
             </div>
         </section>
 

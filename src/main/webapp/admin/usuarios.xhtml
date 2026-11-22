@@ -44,6 +44,17 @@
                     </div>
 
                     <div class="grupo-formulario">
+                        <h:outputLabel for="password" value="Nueva contraseña (opcional)" />
+                        <h:inputSecret id="password"
+                                       value="#{usuarioAdminBean.password}"
+                                       redisplay="false"
+                                       maxlength="255">
+                            <f:validator validatorId="passwordValidator" />
+                        </h:inputSecret>
+                        <small>Déjala vacía para conservar la contraseña actual. Debe tener al menos 8 caracteres, una mayúscula, una minúscula y un número.</small>
+                    </div>
+
+                    <div class="grupo-formulario">
                         <h:outputLabel for="rol" value="Rol" />
                         <h:selectOneMenu id="rol"
                                          value="#{usuarioAdminBean.rol}"

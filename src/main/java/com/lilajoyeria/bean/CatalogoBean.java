@@ -35,6 +35,7 @@ public class CatalogoBean implements Serializable {
     private List<Categoria> categorias = new ArrayList<>();
 
     private String texto;
+    private String categoriaInicial;
     private Integer idCategoria;
     private boolean soloDisponibles;
 
@@ -108,8 +109,39 @@ public class CatalogoBean implements Serializable {
         filtrar();
     }
 
+    public void aplicarCategoriaInicial() {
+        if (categoriaInicial == null || categoriaInicial.trim().isEmpty()) {
+            return;
+        }
+
+        String buscada = categoriaInicial.trim();
+        Categoria categoria = categorias.stream()
+                .filter(c -> c.getNombre().equalsIgnoreCase(buscada))
+                .findFirst()
+                .orElse(null);
+
+        if (categoria == null) {
+            FacesContext contexto = FacesContext.getCurrentInstance();
+            if (contexto != null) {
+                contexto.addMessage(
+                        null,
+                        new FacesMessage(
+                                FacesMessage.SEVERITY_WARN,
+                                "Categoría no encontrada",
+                                "No existe la categoría seleccionada."
+                        )
+                );
+            }
+            return;
+        }
+
+        idCategoria = categoria.getIdCategoria();
+        filtrar();
+    }
+
     public void limpiar() {
         texto = null;
+        categoriaInicial = null;
         idCategoria = null;
         soloDisponibles = false;
         filtrar();
@@ -130,6 +162,14 @@ public class CatalogoBean implements Serializable {
 
     public String getTexto() {
         return texto;
+    }
+
+    public String getCategoriaInicial() {
+        return categoriaInicial;
+    }
+
+    public void setCategoriaInicial(String categoriaInicial) {
+        this.categoriaInicial = categoriaInicial;
     }
 
     public void setTexto(String texto) {
